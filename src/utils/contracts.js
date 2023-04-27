@@ -19,6 +19,7 @@ const controlCenterContract = provider => new Contract(CONTROL_CENTER_ADDRESS, C
 const marketplaceContract = provider => new Contract(MARKETPLACE_ADDRESS, Marketplace.abi, provider)
 const sharedContract = provider => new Contract(SHARED_ADDRESS, Shared.abi, provider)
 const collectionFactoryContract = provider => new Contract(COLLECTION_FACTORY_ADDRESS, CollectionFactory.abi, provider)
+const vietnameseDong = provider => new Contract(VIETNAMESE_DONG_ADDRESS, VietnameseDong.abi, provider)
 
 export {
     ControlCenter,
@@ -38,4 +39,5 @@ export {
     controlCenterContract,
     marketplaceContract,
     sharedContract,
+    vietnameseDong,
 }

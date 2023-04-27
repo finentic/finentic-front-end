@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
 import { useEth } from '../../contexts'
 import { constants } from 'ethers'
-import { BUTTON_STATE } from '../../utils'
+import { BUTTON_STATE, MARKETPLACE_ADDRESS } from '../../utils'
 import { createItem } from '../../api'
 
 
@@ -47,12 +47,12 @@ function Create(props) {
 
   const handleSubmit = async (event) => {
     event.preventDefault()
-    // setButtonState(BUTTON_STATE.PENDING)
+    setButtonState(BUTTON_STATE.PENDING)
     const { currentTarget } = event;
     const currentTokenId = await eth.SharedContract.currentTokenId()
     const formData = new FormData();
     formData.append('token_id', currentTokenId.toString());
-    formData.append('owner_address', eth.account._id);
+    formData.append('owner_address', eth.account._id.toLowerCase());
     formData.append('name', nftFormData.name);
     formData.append('from_collection_address', eth.SharedContract.address);
     formData.append('description', nftFormData.description);
@@ -64,7 +64,7 @@ function Create(props) {
 
     const response = await createItem(formData);
     console.log(response.data.hashed_metadata);
-    await eth.SharedContract.mint(eth.account._id, response.data.hashed_metadata)
+    await eth.SharedContract.mintAndApprove(eth.account._id, MARKETPLACE_ADDRESS, response.data.hashed_metadata)
     setButtonState(BUTTON_STATE.DONE)
   }
 

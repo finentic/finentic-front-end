@@ -8,6 +8,7 @@ import {
   TokenSale,
 } from "../pages";
 import { NavigationBar } from "../components";
+import ItemDetail from "../pages/home/ItemDetail";
 
 const MainRoutes = () => {
   return (
@@ -20,6 +21,7 @@ const MainRoutes = () => {
           <Route path="home" element={<Navigate to="home" replace />} />
           <Route path="tokenSale" element={<TokenSale pageTitle="Buy FxETH" />} />
           <Route path="create" element={<Create pageTitle="Create NFT" />} />
+          <Route path="item/:itemId" element={<ItemDetail pageTitle="Detail" />} />
 
           {/* for error routes */}
           <Route path="*" element={<Error404 pageTitle="Not found" />} />

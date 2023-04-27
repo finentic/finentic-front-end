@@ -7,6 +7,7 @@ import {
   controlCenterContract,
   marketplaceContract,
   sharedContract,
+  vietnameseDong,
 } from '../utils'
 import { getAccount } from '../api'
 
@@ -18,7 +19,7 @@ function EthProvider({ children }) {
   const init = useCallback(
     async artifacts => {
       let provider, signer, network, account
-      let ControlCenterContract, CollectionFactoryContract, MarketplaceContract, SharedContract
+      let ControlCenterContract, CollectionFactoryContract, MarketplaceContract, SharedContract, VietnameseDong
       try {
         if (window.ethereum) {
           provider = new ethers.providers.Web3Provider(window.ethereum)
@@ -35,6 +36,7 @@ function EthProvider({ children }) {
         CollectionFactoryContract = collectionFactoryContract(signerContract)
         MarketplaceContract = marketplaceContract(signerContract)
         SharedContract = sharedContract(signerContract)
+        VietnameseDong = vietnameseDong(signerContract)
 
         // eslint-disable-next-line eqeqeq
         if (network.chainId != DEFAULT_CHAIN) console.error(
@@ -56,6 +58,7 @@ function EthProvider({ children }) {
         CollectionFactoryContract,
         MarketplaceContract,
         SharedContract,
+        VietnameseDong,
       })
     }, [])
 

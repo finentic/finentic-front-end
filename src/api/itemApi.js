@@ -6,11 +6,15 @@ function createItem(formData) {
 }
 
 function getItemById(item_id) {
-  return axiosInstance.get(`/items/detail/`, { params: { item_id } })
+  return axiosInstance.get(`/items/detail`, { params: { item_id } })
 }
 
-function getItems(params) {
-  return axiosInstance.get('/item/newest', params)
+function searchItem(keywords) {
+  return axiosInstance.get('/items/search', { params: { keywords } })
+}
+
+function exploreItem() {
+  return axiosInstance.get('/items/explore')
 }
 
 function getItemsSuggested(productId, limitResults = 3) {
@@ -40,8 +44,9 @@ function deleteItem(productId) {
 }
 
 export {
+  exploreItem,
   getItemById,
-  getItems,
+  searchItem,
   getItemsSuggested,
   updateItem,
   createItem,
