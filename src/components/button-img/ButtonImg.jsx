@@ -1,7 +1,7 @@
 import { Button, Image, OverlayTrigger, Tooltip } from 'react-bootstrap'
 
 
-function ButtonImg({ imgUrl, title, tooltip, onClick }) {
+function ButtonImg({ imgUrl, title, tooltip, onClick, className }) {
     return (
       <OverlayTrigger
         placement="bottom"
@@ -15,7 +15,7 @@ function ButtonImg({ imgUrl, title, tooltip, onClick }) {
           <Button
             variant="light"
             {...triggerHandler}
-            className="d-inline-flex align-items-center py-0 ps-0 border-0 shadow-hover background-color-none-hover"
+            className={`d-inline-flex align-items-center py-0 ps-0 border-0 shadow-hover background-color-none-hover ${className}`}
             style={{
               borderRadius: '16px',
             }}

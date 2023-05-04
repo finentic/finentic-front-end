@@ -109,7 +109,11 @@ function Detail({ item }) {
 
           <div className='py-3'>
             <div className={`rounded-3 shadow border h-100 w-100`}>
-              <ImgBgBlur alt={item.name} fileUri={item.pictures[0].file_uri} onClick={() => setIsShowModalItemPicture(true)} />
+              <ImgBgBlur
+                alt={item.name}
+                fileUri={item.pictures[0].file_uri}
+                onClick={() => setIsShowModalItemPicture(true)}
+              />
             </div>
           </div>
           <ModalImg
