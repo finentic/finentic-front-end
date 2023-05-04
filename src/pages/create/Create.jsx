@@ -69,9 +69,9 @@ function Create(props) {
   }
 
   return (
-    <div className='px-5 pt-5'>
+    <div className='container py-4'>
       <form onSubmit={handleSubmit}>
-        <h2>Create Shared NFT</h2>
+        <h1 className='fw-bold fs-2'>Create Shared NFT</h1>
 
         <div className='form-group my-3'>
           <div className='text-muted mb-2'>
@@ -161,7 +161,7 @@ function Create(props) {
         <div className='my-3 fw-bold fst-italic text-danger'>
           <FontAwesomeIcon icon={faExclamationTriangle} /> Freeze metadata:
           <span className='fw-normal text-dark'>
-            Your metadata will not lock and store all of this item's content in decentralized file storage.
+            { } Your metadata will not lock and store all of this item's content in decentralized file storage.
           </span>
         </div>
         {
