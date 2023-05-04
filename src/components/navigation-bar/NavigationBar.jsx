@@ -1,4 +1,4 @@
-import React from 'react'
+import { useState } from 'react'
 import { Nav, Navbar, NavDropdown, Container } from 'react-bootstrap'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSearch } from '@fortawesome/free-solid-svg-icons'
@@ -12,11 +12,11 @@ function addressOverflow(address) {
 function NavigationBar(props) {
     const { eth } = useEth()
     const navigate = useNavigate()
-    const [expanded, setExpanded] = React.useState(false);
+    const [expanded, setExpanded] = useState(false);
     return (
         <Navbar expand="lg" bg="white" fixed="top" className='shadow-sm' expanded={expanded} >
             <Container>
-                <Navbar.Brand onClick={() => navigate('/')} className='fw-bold fs-4'>
+                <Navbar.Brand onClick={() => navigate('/')} className='fw-bold fs-4 cursor-pointer'>
                     <img
                         src="/logo/brand_V.png"
                         alt="FINENTIC"
