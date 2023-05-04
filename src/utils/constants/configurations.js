@@ -1,4 +1,5 @@
 const FxETH_DECIMALS = '18'
+const PERCENTAGE = '10000'
 
 const DEFAULT_CHAIN = process.env.REACT_APP_DEFAULT_CHAIN
 
@@ -11,8 +12,9 @@ const FAUCET_URI = {
 
 export {
     FxETH_DECIMALS,
+    PERCENTAGE,
     DEFAULT_CHAIN,
     API_BASE_URI,
     RPC_URI,
-    FAUCET_URI
+    FAUCET_URI,
 }
