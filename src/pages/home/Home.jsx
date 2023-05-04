@@ -1,11 +1,7 @@
 import { useEffect, useState } from 'react'
-// import { useEth } from '../../contexts'
 import { usePageTitle } from '../../hooks'
-// import { BUTTON_STATE, REGEX_NUMBER } from '../../utils'
-// import { isAddress, parseUnits, formatUnits } from 'ethers/lib/utils'
-// import { ButtonSubmit, Footer } from '../../components'
-import ItemCard from './ItemCard'
 import { exploreItem } from '../../api'
+import { ItemCard } from '../../components/item-card/ItemCard'
 
 function Home(props) {
   const { pageTitle } = props
