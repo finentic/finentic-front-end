@@ -1,6 +1,6 @@
 import { Dropdown, DropdownButton, Form, InputGroup } from "react-bootstrap"
 
-const ListingAuction = ({ listingForm, handleInputChange }) => {
+const ListingAuction = ({ listingForm, handleInputChange, datetimeStart, datetimeEnded }) => {
     return (
         <>
             <div className='form-group py-3'>
@@ -34,6 +34,7 @@ const ListingAuction = ({ listingForm, handleInputChange }) => {
                 <span className='fw-bold fs-5'>Duration</span>
                 <br />
                 <small className='text-muted'>
+                    Auction duration must last more than 1 hour
                 </small>
             </div>
             <div className='form-group mb-3 row'>
@@ -48,6 +49,8 @@ const ListingAuction = ({ listingForm, handleInputChange }) => {
                         value={listingForm.startTime}
                         onChange={handleInputChange}
                         type='datetime-local'
+                        min={datetimeStart.toISOString().slice(0, 16)}
+                        required
                     />
                 </div>
 
@@ -61,6 +64,8 @@ const ListingAuction = ({ listingForm, handleInputChange }) => {
                         value={listingForm.endTime}
                         onChange={handleInputChange}
                         type='datetime-local'
+                        min={datetimeEnded.toISOString().slice(0, 16)}
+                        required
                     />
                 </div>
             </div>
