@@ -164,7 +164,7 @@ function Detail({ item }) {
               >
                 Edit item
               </Button>
-              {(!item.price) && (
+              {(item.state === ITEM_STATE.CREATED) && (
                 <Button
                   className='fs-6 fw-bold'
                   size='lg'

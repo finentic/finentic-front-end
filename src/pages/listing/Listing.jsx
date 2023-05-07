@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { usePageTitle } from '../../hooks'
 import { ButtonSubmit } from '../../components'
 import { useEth } from '../../contexts'
-import { BUTTON_STATE, SHARED_ADDRESS, VIETNAMESE_DONG_ADDRESS, getTokenIdFromItemId } from '../../utils'
+import { BUTTON_STATE, ITEM_STATE, MARKETPLACE_ADDRESS, SHARED_ADDRESS, VIETNAMESE_DONG_ADDRESS, getTokenIdFromItemId } from '../../utils'
 import { getItemById } from '../../api'
 import { useNavigate, useParams } from 'react-router-dom'
 import { commify, parseEther } from 'ethers/lib/utils'
@@ -26,15 +26,16 @@ function Listing({ pageTitle }) {
         const item = await getItemById(itemId)
         console.log(item)
         setItemDetail(item.data)
-      } catch (error) { }
+      } catch (error) {
+        console.error(error)
+      }
     }
     getItemList()
-    return () => setItemDetail()
+    return () => setItemDetail(false)
   }, [itemId])
-
   if (!itemDetail) return null
   const isOwner = (itemDetail.owner._id.toLowerCase() === eth.account._id.toLowerCase())
-  if (!isOwner || itemDetail.price) navigate(`/item/${itemDetail._id}`)
+  if (!isOwner || itemDetail.state !== ITEM_STATE.CREATED) navigate(`/item/${itemDetail._id}`)
   return (<ListForSale
     item={itemDetail}
     key={itemDetail._id}
@@ -82,25 +83,32 @@ function ListForSale({ item }) {
     const startTime = new Date(listingForm.startTime).getTime() / 1000
     const endTime = new Date(listingForm.endTime).getTime() / 1000
     try {
-      if (listingForm.method === 'fixed') await eth.MarketplaceContract.listForBuyNow(
-        SHARED_ADDRESS,
-        getTokenIdFromItemId(item._id),
-        item.is_phygital,
-        VIETNAMESE_DONG_ADDRESS,
-        price,
-      )
-      else await eth.MarketplaceContract.listForAuction(
-        SHARED_ADDRESS,
-        getTokenIdFromItemId(item._id),
-        item.is_phygital,
-        startTime,
-        endTime,
-        VIETNAMESE_DONG_ADDRESS,
-        price,
-        '1',
-      )
-      setButtonState(BUTTON_STATE.DONE)
-      navigate(`/item/${item._id}`)
+      const getApproved = await eth.SharedContract.getApproved(getTokenIdFromItemId(item._id))
+      const isApprovedForAll = await eth.SharedContract.isApprovedForAll(eth.account._id, MARKETPLACE_ADDRESS)
+      if (!(getApproved.toLowerCase() === MARKETPLACE_ADDRESS.toLowerCase() || isApprovedForAll)) {
+        await eth.SharedContract.approve(MARKETPLACE_ADDRESS, getTokenIdFromItemId(item._id))
+        eth.SharedContract.on('Approval', async (owner) => (owner.toLowerCase() === eth.account._id) && setButtonState(BUTTON_STATE.DONE))
+      } else {
+        if (listingForm.method === 'fixed') await eth.MarketplaceContract.listForBuyNow(
+          SHARED_ADDRESS,
+          getTokenIdFromItemId(item._id),
+          item.is_phygital,
+          VIETNAMESE_DONG_ADDRESS,
+          price,
+        )
+        else await eth.MarketplaceContract.listForAuction(
+          SHARED_ADDRESS,
+          getTokenIdFromItemId(item._id),
+          item.is_phygital,
+          startTime,
+          endTime,
+          VIETNAMESE_DONG_ADDRESS,
+          price,
+          '1',
+        )
+        setButtonState(BUTTON_STATE.DONE)
+        navigate(`/item/${item._id}`)
+      }
     } catch (error) {
       console.error(error)
       setButtonState(BUTTON_STATE.REJECTED)
