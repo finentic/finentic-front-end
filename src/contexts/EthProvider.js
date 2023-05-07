@@ -14,10 +14,10 @@ import { getAccount } from '../api'
 const EthContext = createContext()
 
 function EthProvider({ children }) {
-  const [eth, setEth] = useState({ artifacts: undefined })
+  const [eth, setEth] = useState({ account: { _id: ethers.constants.AddressZero } })
 
   const init = useCallback(
-    async artifacts => {
+    async () => {
       let provider, signer, network, account
       let ControlCenterContract, CollectionFactoryContract, MarketplaceContract, SharedContract, VietnameseDong
       try {
@@ -26,7 +26,7 @@ function EthProvider({ children }) {
           const accounts = await provider.send("eth_requestAccounts", [])
           signer = provider.getSigner()
           account = (await getAccount(accounts[0])).data
-        } else {
+      } else {
           provider = new ethers.providers.JsonRpcProvider(RPC_URI)
         }
         network = await provider.detectNetwork()
@@ -49,7 +49,6 @@ function EthProvider({ children }) {
         console.error(err)
       }
       setEth({
-        artifacts,
         provider,
         account,
         signer,
@@ -81,15 +80,15 @@ function EthProvider({ children }) {
   useEffect(() => {
     if (window.ethereum) {
       const events = ["chainChanged", "accountsChanged"]
-      const handleChange = () => init(eth.artifacts)
+      const handleChange = () => init()
       events.forEach(e => window.ethereum.on(e, handleChange))
       return () => {
         events.forEach(e => window.ethereum.removeListener(e, handleChange))
       }
     }
-  }, [init, eth.artifacts, eth.account])
+  }, [init, eth.provider, eth.account])
 
-  const ethContext = useMemo(() => ({ eth, setEth }), [eth])
+  const ethContext = useMemo(() => ({ eth }), [eth])
 
   return (
     <EthContext.Provider value={ethContext}>
