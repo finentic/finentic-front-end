@@ -9,8 +9,7 @@ import { BUTTON_STATE, MARKETPLACE_ADDRESS } from '../../utils'
 import { createItem } from '../../api'
 
 
-function Create(props) {
-  const { pageTitle } = props
+function Create({ pageTitle }) {
   usePageTitle(pageTitle)
   const { eth } = useEth()
 
@@ -61,11 +60,19 @@ function Create(props) {
     for (const element of currentTarget.pictures.files) {
       formData.append('files', element);
     }
-
-    const response = await createItem(formData);
-    console.log(response.data.hashed_metadata);
-    await eth.SharedContract.mintAndApprove(eth.account._id, MARKETPLACE_ADDRESS, response.data.hashed_metadata)
-    setButtonState(BUTTON_STATE.DONE)
+    try {
+      const response = await createItem(formData)
+      console.log(response.data.hashed_metadata)
+      await eth.SharedContract.mintAndApprove(
+        eth.account._id,
+        MARKETPLACE_ADDRESS,
+        response.data.hashed_metadata,
+      )
+      setButtonState(BUTTON_STATE.DONE)
+    } catch (error) {
+      console.error(error)
+      setButtonState(BUTTON_STATE.REJECTED)
+    }
   }
 
   return (
@@ -112,7 +119,7 @@ function Create(props) {
             type='text'
             className='form-control'
             placeholder='Item name'
-            maxLength='128'
+            maxLength='64'
             required
           />
         </div>
@@ -126,6 +133,7 @@ function Create(props) {
             name='description'
             id='description'
             rows='3'
+            maxLength='2048'
             onChange={handleInputChange}
             value={nftFormData.description}
             className='form-control'
@@ -143,11 +151,12 @@ function Create(props) {
           <input
             name='external_url'
             id='external_url'
+            maxLength='128'
             value={nftFormData.external_url}
             onChange={handleInputChange}
             type='text'
             className='form-control'
-            placeholder='https://yoursite.io/item/123'
+            placeholder='https://yoursite.io/items/0x123'
           />
         </div>
 
@@ -161,7 +170,7 @@ function Create(props) {
         <div className='my-3 fw-bold fst-italic text-danger'>
           <FontAwesomeIcon icon={faExclamationTriangle} /> Freeze metadata:
           <span className='fw-normal text-dark'>
-            { } Your metadata will not lock and store all of this item's content in decentralized file storage.
+            { } Freezing metadata will permanently hash all required fields of this item content and store hashed metadata in blockchain.
           </span>
         </div>
         {
