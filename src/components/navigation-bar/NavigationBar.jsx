@@ -71,7 +71,7 @@ function NavigationBar(props) {
                                 <NavDropdown.Item
                                     onClick={() => {
                                         setExpanded(false)
-                                        navigate('/profile')
+                                        navigate('/account/' + eth.account._id)
                                     }}> Profile </NavDropdown.Item>
                                 <NavDropdown.Item
                                     onClick={() => {
@@ -90,7 +90,7 @@ function NavigationBar(props) {
                                 className='fw-bold me-4'
                                 onClick={() => {
                                     setExpanded(false)
-                                    navigate('/profile')
+                                    navigate('/account/' + eth.account._id)
                                 }}> Login
                             </Nav.Link>
                         }

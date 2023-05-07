@@ -1,9 +1,6 @@
 import React from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useNavigate } from 'react-router-dom'
-import { toImgUrl } from '../../utils'
-import { formatEther } from 'ethers/lib/utils'
-import { faDongSign } from '@fortawesome/free-solid-svg-icons'
+import { toImgUrl, formatPrice } from '../../utils'
 import { ButtonImg } from '../button-img'
 
 
@@ -54,7 +51,7 @@ function ItemCard({ item }) {
                     <h6 className="card-subtitle text-muted mb-2 text-nowrap overflow-hidden">{item.owner.name}</h6>
                     <p className="card-text">
                         {(item.price)
-                            ? (formatEther(item.price) + ' VND')
+                            ? (formatPrice(item.price) + ' VND')
                             : 'Not for sale'
                         }
                     </p>
