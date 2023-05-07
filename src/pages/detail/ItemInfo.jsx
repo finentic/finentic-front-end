@@ -3,8 +3,9 @@ import { ButtonImg } from "../../components"
 import { toImgUrl } from "../../utils"
 import { faTruckFast } from "@fortawesome/free-solid-svg-icons"
 import { useNavigate } from "react-router-dom"
+import { faEthereum } from "@fortawesome/free-brands-svg-icons"
 
-const ItemInfo = ({ name, from_collection, owner, ownership_history }) => {
+const ItemInfo = ({ name, from_collection, owner, ownership_history, is_phygital }) => {
   const navigate = useNavigate()
 
   return (
@@ -18,9 +19,18 @@ const ItemInfo = ({ name, from_collection, owner, ownership_history }) => {
       <h1 className="col col-12 pt-2">
         {name}
       </h1>
-      <div className='text-secondary'>
+      <div className='text-secondary' hidden={!is_phygital}>
+        <FontAwesomeIcon icon={faEthereum} />|
+        <FontAwesomeIcon icon={faEthereum} />|
+        <FontAwesomeIcon icon={faEthereum} />|
         <FontAwesomeIcon icon={faTruckFast} className='me-2' />
         Phygital NFT
+      </div>
+      <div className='text-secondary' hidden={is_phygital}>
+        <FontAwesomeIcon icon={faEthereum} />|
+        <FontAwesomeIcon icon={faEthereum} />|
+        <FontAwesomeIcon icon={faEthereum} className='me-2' />
+        Digital NFT
       </div>
       <br />
       <div className='row'>
@@ -30,10 +40,10 @@ const ItemInfo = ({ name, from_collection, owner, ownership_history }) => {
               Created by:
             </div>
             <ButtonImg
-              imgUrl={toImgUrl(ownership_history[0].owner.avatar_thumb)}
-              title={ownership_history[0].owner.name}
-              tooltip={'Account of ' + ownership_history[0].owner.name}
-              onClick={() => navigate(`/account/${ownership_history[0].owner._id}`)}
+              imgUrl={toImgUrl(ownership_history[0].account.thumbnail)}
+              title={ownership_history[0].account.name}
+              tooltip={'Account of ' + ownership_history[0].account.name}
+              onClick={() => navigate(`/account/${ownership_history[0].account._id}`)}
             />
           </div>
         </div>
@@ -43,7 +53,7 @@ const ItemInfo = ({ name, from_collection, owner, ownership_history }) => {
               Owned by:
             </div>
             <ButtonImg
-              imgUrl={toImgUrl(owner.avatar_thumb)}
+              imgUrl={toImgUrl(owner.thumbnail)}
               title={owner.name}
               tooltip={'Account of ' + owner.name}
               onClick={() => navigate(`/account/${owner._id}`)}

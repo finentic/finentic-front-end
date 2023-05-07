@@ -1,24 +1,54 @@
-import React, { useEffect, useState } from 'react'
+import {
+  BUTTON_STATE,
+  MARKETPLACE_ADDRESS,
+  SHARED_ADDRESS,
+  ITEM_STATE,
+  LISTING_STATE,
+  getTokenIdFromItemId,
+  timestampToDate,
+  formatPrice,
+  toBN,
+  toImgUrl,
+} from '../../utils'
+import {
+  faBriefcaseClock,
+  faChain,
+  faClockRotateLeft,
+  faIdCard,
+  faList,
+  faTag,
+  faUserFriends,
+} from '@fortawesome/free-solid-svg-icons';
+import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ButtonSubmit, ImgBgBlur, ModalImg } from '../../components';
+import { commify, parseUnits } from 'ethers/lib/utils';
+import { Accordion, Button, Dropdown, DropdownButton, Form, InputGroup } from 'react-bootstrap';
+import { useEth } from '../../contexts';
 import { usePageTitle } from '../../hooks';
 import { getItemById } from '../../api';
-import { BUTTON_STATE, MARKETPLACE_ADDRESS, SHARED_ADDRESS, VIETNAMESE_DONG_ADDRESS, toImgUrl } from '../../utils'
-import { constants } from 'ethers';
-import { useEth } from '../../contexts';
-import { commify, formatUnits, parseUnits } from 'ethers/lib/utils';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { ButtonImg, ButtonSubmit, ImgBgBlur, ModalImg } from '../../components';
 import About from './About';
 import CardInfo from './CardInfo';
-import { Accordion, Button } from 'react-bootstrap';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChain, faIdCard, faList, faTags, faUserFriends } from '@fortawesome/free-solid-svg-icons';
 import ItemInfo from './ItemInfo';
-import { ITEM_STATE } from '../../utils/constants/states';
 
-const formatPrice = (price) => commify(Number(formatUnits(price, 'ether')))
+const BUTTON_TITLE = {
+  'BUY_NOW': 'Buy now',
+  'START_SOON': 'Preparing',
+  'ACTIVE': 'Place bid',
+  'ENDED': 'Ended',
+}
 
-function ItemDetail(props) {
-  const { pageTitle } = props
+const LISTING_TITLE = {
+  'BUY_NOW': 'Buy now',
+  'START_SOON': 'Auction will start soon',
+  'ACTIVE': 'Auction active',
+  'ENDED': 'Auction has ended',
+}
+
+
+function ItemDetail({ pageTitle }) {
+  const { eth } = useEth()
   const { itemId } = useParams()
   usePageTitle(pageTitle)
   const [itemDetail, setItemDetail] = useState(false)
@@ -29,80 +59,125 @@ function ItemDetail(props) {
         const item = await getItemById(itemId)
         console.log(item)
         setItemDetail(item.data)
-      } catch (error) { }
+      } catch (error) { console.error(error) }
     }
     getItemList()
-    return () => setItemDetail()
+    return () => setItemDetail(false)
   }, [itemId])
-  if (!itemDetail) return null
+  if (!itemDetail || !eth.account) return null
   return (<Detail item={itemDetail} key={itemDetail._id} />)
 }
 
 function Detail({ item }) {
   const { eth } = useEth()
   const navigate = useNavigate()
-
+  usePageTitle(item.name)
+  const isOwner = (item.owner._id.toLowerCase() === eth.account._id.toLowerCase())
   const [buttonState, setButtonState] = useState(BUTTON_STATE.ENABLE)
   const [isShowModalItemPicture, setIsShowModalItemPicture] = useState(false)
-  const [price, setPrice] = useState(item.price || '0')
+  const now = new Date().getTime()
+  const startTime = Number(item.start_time + '000')
+  const endTime = Number(item.end_time + '000')
+
+  const getListingState = () => {
+    if (!item.start_time) return LISTING_STATE.BUY_NOW
+    if (now < startTime) return LISTING_STATE.START_SOON
+    if (now > startTime && now < endTime) return LISTING_STATE.ACTIVE
+    if (now > endTime) return LISTING_STATE.ENDED
+  }
 
   const resetState = () => setButtonState(BUTTON_STATE.ENABLE)
 
-  const handleSubmit = async event => {
+  const [auctionForm, setAuctionForm] = useState({
+    price: formatPrice(item.price || '0'),
+  })
+
+  const handleInputChange = event => {
+    const target = event.target
+    let value = target.value
+    const name = target.name
+    // validate price input
+    if (name === 'price') {
+      if (!value || Number(value) < 1) value = '0'
+      const price = value.replaceAll(',', '')
+      if (!/^[0-9]+$/.test(price)) return;
+      value = commify(price)
+    }
+    setAuctionForm({ ...auctionForm, [name]: value })
+  }
+
+  const handlePlaceBid = async event => {
     event.preventDefault()
     setButtonState(BUTTON_STATE.PENDING)
-    const isApproved = await eth.SharedContract.getApproved(item._id.substring(43))
-    if (!isApproved) await eth.SharedContract.approve(
-      MARKETPLACE_ADDRESS,
-      item._id.substring(43),
-    ).then(() => setButtonState(BUTTON_STATE.ENABLE)).catch(() => setButtonState(BUTTON_STATE.REJECTED))
-
-    await eth.MarketplaceContract.listForBuyNow(
-      SHARED_ADDRESS,
-      item._id.substring(43),
-      item.is_phygital,
-      VIETNAMESE_DONG_ADDRESS,
-      parseUnits(price, 'ether'),
-    ).then(() => setButtonState(BUTTON_STATE.DONE)).catch(() => setButtonState(BUTTON_STATE.REJECTED))
+    try {
+      const bid = parseUnits(auctionForm.price.replaceAll(',', ''), '18')
+      const isEnoughAllowance = await eth.VietnameseDong.allowance(eth.account._id, MARKETPLACE_ADDRESS)
+      if (isEnoughAllowance.lt(bid)) {
+        await eth.VietnameseDong.approve(MARKETPLACE_ADDRESS, bid)
+        eth.VietnameseDong.on('Approval', async (owner) => (owner.toLowerCase() === eth.account._id) && setButtonState(BUTTON_STATE.DONE))
+      }
+      await eth.MarketplaceContract.biddingForAuction(
+        SHARED_ADDRESS,
+        getTokenIdFromItemId(item._id),
+        bid,
+      )
+      setButtonState(BUTTON_STATE.DONE)
+    } catch (error) {
+      console.error(error)
+      setButtonState(BUTTON_STATE.REJECTED)
+    }
   }
 
   const handleBuyNow = async event => {
     event.preventDefault()
+    event.preventDefault()
     setButtonState(BUTTON_STATE.PENDING)
-    const allowance = await eth.VietnameseDong.allowance(eth.account._id, eth.MarketplaceContract.address)
-    console.log('allowance', allowance);
-    console.log('price', parseUnits(price, 0));
-    if (allowance.lt(parseUnits(price, 0))) await eth.VietnameseDong.approve(
-      MARKETPLACE_ADDRESS,
-      constants.MaxUint256,
-    ).then(() => setButtonState(BUTTON_STATE.DONE)).catch(() => setButtonState(BUTTON_STATE.REJECTED))
-    await eth.MarketplaceContract.buyNow(
-      SHARED_ADDRESS,
-      item._id.substring(43),
-    ).then(() => setButtonState(BUTTON_STATE.DONE)).catch(() => setButtonState(BUTTON_STATE.REJECTED))
+    try {
+      const price = parseUnits(item.price, '0')
+      const isEnoughAllowance = await eth.VietnameseDong.allowance(eth.account._id, MARKETPLACE_ADDRESS)
+      if (isEnoughAllowance.lt(price)) {
+        await eth.VietnameseDong.approve(MARKETPLACE_ADDRESS, price)
+        eth.VietnameseDong.on('Approval', async (owner) => (owner.toLowerCase() === eth.account._id) && setButtonState(BUTTON_STATE.DONE))
+      }
+      await eth.MarketplaceContract.buyNow(
+        SHARED_ADDRESS,
+        getTokenIdFromItemId(item._id),
+      )
+      setButtonState(BUTTON_STATE.DONE)
+    } catch (error) {
+      console.error(error)
+      setButtonState(BUTTON_STATE.REJECTED)
+    }
   }
 
   return (
     <div className='container pt-3'>
-      <div className='text-end'>
-        <div className='d-inline-flex'>
-          <Button
-            variant='outline-secondary'
-            className='me-3 fs-6 fw-bold'
-            size='lg'
-          >
-            Edit item
-          </Button>
-          <Button
-            className='fs-6 fw-bold'
-            size='lg'
-            onClick={() => navigate(`/item/${item._id}/listing`)}
-          >
-            List for sale
-          </Button>
-        </div>
-      </div>
-      <hr className="hr" />
+      {(isOwner) && (
+        <>
+          <div className='text-end'>
+            <div className='d-inline-flex'>
+              <Button
+                variant='outline-secondary'
+                className='me-3 fs-6 fw-bold'
+                size='lg'
+                onClick={() => navigate(`/item/${item._id}/edit`)}
+              >
+                Edit item
+              </Button>
+              {(!item.price) && (
+                <Button
+                  className='fs-6 fw-bold'
+                  size='lg'
+                  onClick={() => navigate(`/item/${item._id}/listing`)}
+                >
+                  List for sale
+                </Button>
+              )}
+            </div>
+          </div>
+          <hr className="hr" />
+        </>
+      )}
 
       <div className='row row-cols-2'>
         <div className='col col-12 col-md-6'>
@@ -138,15 +213,15 @@ function Detail({ item }) {
                   </Accordion.Body>
                 </Accordion.Item>
 
-                <Accordion.Item eventKey={'About ' + item.ownership_history[0].owner.name}>
+                <Accordion.Item eventKey={'About ' + item.creator.name}>
                   <Accordion.Header>
                     <FontAwesomeIcon icon={faIdCard} />
                     <span className='fw-bold ms-2'>
-                      {'About ' + item.ownership_history[0].owner.name}
+                      {'About ' + item.creator.name}
                     </span>
                   </Accordion.Header>
                   <Accordion.Body>
-                    {item.ownership_history[0].owner.name}
+                    {item.creator.bio || <div className='text-center text-secondary fw-bold'>This collection has no description yet.</div>}
                   </Accordion.Body>
                 </Accordion.Item>
 
@@ -169,66 +244,168 @@ function Detail({ item }) {
         <div className='col col-12 col-md-6'>
           <ItemInfo
             name={item.name}
+            is_phygital={item.is_phygital}
             from_collection={item.from_collection}
             owner={item.owner}
             ownership_history={item.ownership_history}
           />
 
           {(item.state === ITEM_STATE.LISTING) && (
-            <CardInfo>
-              <form onSubmit={handleBuyNow} hidden={eth.account?._id.toLowerCase() === item.owner._id.toLowerCase()}>
-                <div className='row my-3'>
-                  <div className='col'>
-                    <div className='form-group'>
-                      <label htmlFor='price' className='fw-bold'>
-                        Price:
-                      </label> {formatPrice(price)} VND
-                    </div>
-                  </div>
-                  <div className='col-4'>
-                    <div className='form-group'>
-                      <label htmlFor='unit' className='fw-bold'>Unit:</label>
-                      <br />
-                      <small className='text-muted'>Price in </small>
-                      <select className='form-control' name='unit' id='unit'>
-                        <option>Vietnamese Dong (VND)</option>
-                        <option disabled>USD Coin (USDC)</option>
-                        <option disabled>Ether (ETH)</option>
-                      </select>
-                    </div>
-                  </div>
+            <CardInfo
+              icon={item.start_time ? faBriefcaseClock : faTag}
+              title={LISTING_TITLE[getListingState()]}
+              defaultActive
+            >
+              <form onSubmit={(!item.start_time) ? handleBuyNow : handlePlaceBid}>
+                <div className='col'>
+                  <p>
+                    {item.start_time ? 'Top bid' : 'Price'}: <br />
+                    <span className='fs-4 fw-bold'>
+                      {(formatPrice(item.price) + ' VND')}
+                    </span>
+                  </p>
                 </div>
-                {
-                  (!item.price)
-                    ? <ButtonSubmit buttonState={BUTTON_STATE.DISABLE} resetState={resetState} title='Not for sale' />
-                    : <ButtonSubmit buttonState={buttonState} resetState={resetState} title='Buy Now' />
-                }
+
+                <div hidden={isOwner}>
+                  {(getListingState() === LISTING_STATE.ACTIVE) && (
+                    <div className='form-group py-3'>
+                      <span className='fw-bold fs-5'>
+                        Place a bid
+                      </span>
+                      <br />
+                      <small className='text-muted'>
+                        Require higher than top bid.
+                      </small>
+                      <InputGroup className="pb-2">
+                        <Form.Control
+                          id='price'
+                          name='price'
+                          size='lg'
+                          type='text'
+                          value={auctionForm.price}
+                          onChange={handleInputChange}
+                          disabled={isOwner}
+                          readOnly={isOwner}
+                        />
+                        <DropdownButton
+                          variant="outline-secondary"
+                          title="VND"
+                          id="currency"
+                          align="end"
+                          disabled
+                        >
+                          <Dropdown.Item href="#">VND - Vietnamese Dong</Dropdown.Item>
+                        </DropdownButton>
+                      </InputGroup>
+                    </div>
+                  )}
+                  <ButtonSubmit
+                    buttonState={
+                      (getListingState() === LISTING_STATE.BUY_NOW || (
+                        getListingState() === LISTING_STATE.ACTIVE && (
+                          toBN(formatPrice(item.price).replaceAll(',', ''))
+                            .lt(toBN(auctionForm.price.replaceAll(',', ''))))))
+                        ? buttonState
+                        : BUTTON_STATE.DISABLE
+                    }
+                    resetState={resetState}
+                    title={BUTTON_TITLE[getListingState()]}
+                  />
+                </div>
               </form>
+
+              {(item.start_time && (
+                <>
+                  <hr className='hr' />
+                  <div className='row text-center text-secondary fw-bold'>
+                    <div className='col col-12 col-md-6'>
+                      Start: {timestampToDate(item.start_time)}
+                    </div>
+                    <div className='col col-12 col-md-6'>
+                      End: {timestampToDate(item.end_time)}
+                    </div>
+                  </div>
+                </>
+              ))}
             </CardInfo>
           )}
 
-          <CardInfo icon={faTags} title='Price History' defaultActive>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-            minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-            aliquip ex ea commodo consequat. Duis aute irure dolor in
-            reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-            pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-            culpa qui officia deserunt mollit anim id est laborum.
+          <CardInfo icon={faClockRotateLeft} title='Price History' defaultActive>
+            <table className="table" hidden={(!item.price_history.length)}>
+              <thead>
+                <tr>
+                  <th scope="col">Offerer</th>
+                  <th scope="col">Amount</th>
+                  <th scope="col">Timestamp</th>
+                </tr>
+              </thead>
+              <tbody>
+                {item.price_history.map(ownership => (
+                  <tr key={ownership.timestamp}>
+                    <td>
+                      <ButtonImg
+                        imgUrl={toImgUrl(ownership.account.thumbnail)}
+                        title={ownership.account.name}
+                        tooltip={'Account of ' + ownership.account.name}
+                        onClick={() => navigate(`/account/${ownership.account._id}`)}
+                      />
+                    </td>
+                    <td>
+                      {formatPrice(ownership.amount)} VND
+                    </td>
+                    <td
+                      className='cursor-pointer'
+                      onClick={() => window.open('https://testnet.snowtrace.io/tx/' + ownership.tx_hash)}
+                    >
+                      {timestampToDate(ownership.timestamp)}
+                    </td>
+
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <div className='fw-bold text-center text-secondary' hidden={(item.price_history.length)}>
+              No events have occurred yet
+            </div>
           </CardInfo>
 
-          <CardInfo icon={faUserFriends} title='Owner History' defaultActive>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-            minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-            aliquip ex ea commodo consequat. Duis aute irure dolor in
-            reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-            pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-            culpa qui officia deserunt mollit anim id est laborum.
+          <CardInfo icon={faUserFriends} title='Ownership History' defaultActive>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th scope="col">Owner</th>
+                  <th scope="col">Timestamp</th>
+                  <th scope="col">Txn Hash</th>
+                </tr>
+              </thead>
+              <tbody>
+                {item.ownership_history.map(ownership => (
+                  <tr key={ownership.timestamp}>
+                    <td>
+                      <ButtonImg
+                        imgUrl={toImgUrl(ownership.account.thumbnail)}
+                        title={ownership.account.name}
+                        tooltip={'Account of ' + ownership.account.name}
+                        onClick={() => navigate(`/account/${ownership.account._id}`)}
+                      />
+                    </td>
+                    <td>
+                      {timestampToDate(ownership.timestamp)}
+                    </td>
+                    <td
+                      className='text-decoration-underline cursor-pointer'
+                      onClick={() => window.open('https://testnet.snowtrace.io/tx/' + ownership.tx_hash)}
+                    >
+                      {ownership.tx_hash.substr(0, 3) + '...' + ownership.tx_hash.substr(63, 66)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </CardInfo>
         </div>
       </div>
-    </div>
+    </div >
   )
 }
 
