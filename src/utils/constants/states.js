@@ -21,8 +21,16 @@ const ITEM_STATE = {
     HIDDEN: 'HIDDEN',
 }
 
+const LISTING_STATE = {
+    BUY_NOW: 'BUY_NOW',
+    START_SOON: 'START_SOON',
+    ACTIVE: 'ACTIVE',
+    ENDED: 'ENDED',
+}
+
 export {
     BUTTON_STATE,
     ACCOUNT_STATE,
     ITEM_STATE,
+    LISTING_STATE,
 }

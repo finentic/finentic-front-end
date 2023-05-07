@@ -8,6 +8,8 @@ import {
   ItemDetail,
   Listing,
   TokenSale,
+  Edit,
+  Profile,
 } from "../pages";
 import { NavigationBar } from "../components";
 
@@ -24,6 +26,8 @@ const MainRoutes = () => {
             <Route path="create" element={<Create pageTitle="Create NFT" />} />
             <Route path="item/:itemId" element={<ItemDetail pageTitle="Detail" />} />
             <Route path="item/:itemId/listing" element={<Listing pageTitle="List for sale" />} />
+            <Route path="item/:itemId/edit" element={<Edit pageTitle="Edit item" />} />
+            <Route path="account/:accountId" element={<Profile pageTitle="Account profile" />} />
 
             {/* for error routes */}
             <Route path="*" element={<Error404 pageTitle="Not found" />} />
