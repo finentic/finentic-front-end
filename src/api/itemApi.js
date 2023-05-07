@@ -30,18 +30,14 @@ function getItemsSuggested(productId, limitResults = 3) {
   return products?.data
 }
 
-function updateItem(productId, formData) {
-  const products = axiosInstance.patch(
-    `/products/${productId}`,
-    formData,
-  )
-  return products?.data
+function getItemForUpdate(itemId) {
+  return axiosInstance.get(`/items/update/${itemId}`)
 }
 
-function deleteItem(productId) {
-  const products = axiosInstance.delete(`/items/${productId}`)
-  return products?.data
+function updateItem(formData) {
+  return axiosInstance.post('/items/update', formData)
 }
+
 
 export {
   exploreItem,
@@ -50,5 +46,5 @@ export {
   getItemsSuggested,
   updateItem,
   createItem,
-  deleteItem,
+  getItemForUpdate
 }
