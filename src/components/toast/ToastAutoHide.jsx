@@ -47,24 +47,18 @@ class ToastAutoHide extends React.Component {
         return (
             <OverlayTrigger
                 trigger={["hover", "focus"]}
-                delay={{ hide: 250, show: 0 }}
                 show={this.state.show}
-                overlay={
-                    <Tooltip {...this.props}>
-                        {this.state.message}
-                    </Tooltip>
-                }
+                overlay={<Tooltip>{this.state.message}</Tooltip>}
                 placement="bottom"
             >
                 <span
                     onClick={this.copyToClipboard}
                     onMouseEnter={this.showTooltip}
                     onMouseLeave={this.hideTooltip}
-                    className='overflow-hidden text-nowrap'
-                    style={{ zIndex: 999 }}
+                    style={{ zIndex: 777 }}
                 >
                     <FontAwesomeIcon icon={faCopy} /> { }
-                    <span className='overflow-hidden text-wrap text-break'>{this.props.title}</span>
+                    <span className='text-wrap text-break'>{this.props.title}</span>
                 </span>
             </OverlayTrigger>
         )

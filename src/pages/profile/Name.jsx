@@ -1,5 +1,6 @@
 import React from 'react'
-import axios from 'axios'
+import { updateName } from '../../api'
+import { Form } from 'react-bootstrap'
 
 
 class Name extends React.Component {
@@ -12,18 +13,18 @@ class Name extends React.Component {
         }
     }
 
-    handleNameSubmit = event => {
-        event.preventDefault()
-        axios
-            .post(`${process.env.REACT_APP_HTTP_SERVER_ENDPOINT}/account/update/name`, {
+    handleNameSubmit = async event => {
+        try {
+            event.preventDefault()
+            await updateName({
+                account_address: this.props._id,
                 name: this.state.newName,
-                _id: this.props._id
             })
-            .then(res => {
-                console.log(res);
-                this.setState({ accountName: this.state.newName })
-                this.hideEditNameElement()
-            })
+            this.setState({ accountName: this.state.newName })
+            this.hideEditNameElement()
+        } catch (error) {
+            console.error(error)
+        }
     }
 
     handleNameChange = event => {
@@ -50,16 +51,17 @@ class Name extends React.Component {
                 </label>
                 {this.state.editNameElement ? (
                     <form className={this.state.editNameElement ? 'd-block' : 'd-none'} onSubmit={this.handleNameSubmit}>
-                        <input
+                        <Form.Control
                             type='text'
                             className='form-control my-1'
                             name='accountName'
                             id='accountName'
+                            maxLength='32'
                             onBlur={this.hideEditNameElement}
                             onChange={this.handleNameChange}
                             value={this.state.newName}
                             required
-                        ></input>
+                        />
                     </form>
                 ) : null}
             </>

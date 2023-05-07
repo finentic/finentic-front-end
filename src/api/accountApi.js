@@ -1,4 +1,4 @@
-import { axiosInstance } from "./axiosInstance"
+import { axiosInstance, axiosUploadFileInstance } from "./axiosInstance"
 
 function createAccount() {
   return axiosInstance.get('/accounts/random')
@@ -8,19 +8,19 @@ function getAccount(account_address) {
   return axiosInstance.get('/accounts/profile', { params: { account_address } })
 }
 
-function updateAvatar(account_address) {
-  return axiosInstance.post('/accounts/update-avatar')
+function updateAvatar(formBody) {
+  return axiosUploadFileInstance.post('/accounts/update-avatar', formBody)
 }
 
-function updateBio(account_address) {
-  return axiosInstance.post('/accounts/update-bio')
+function updateBio(formBody) {
+  return axiosInstance.post('/accounts/update-bio', formBody)
 }
 
-function updateExternalUrl(account_address) {
-  return axiosInstance.post('/accounts/update-external-url')
+function updateExternalUrl(formBody) {
+  return axiosInstance.post('/accounts/update-external-url', formBody)
 }
 
-function updateName(account_address, formBody) {
+function updateName(formBody) {
   return axiosInstance.post('/accounts/update-name', formBody)
 }
 
