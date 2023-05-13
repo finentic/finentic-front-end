@@ -1,10 +1,12 @@
 import { Button, Image, OverlayTrigger, Tooltip } from 'react-bootstrap'
 
 
-function ButtonImg({ imgUrl, title, tooltip, onClick, className, size = 28, fontSize = 14 }) {
+function ButtonImg({ imgUrl, title, tooltip, onClick, className, size = 26, fontSize = 14 }) {
   return (
     <OverlayTrigger
       placement="bottom"
+      delayShow={300}
+      delayHide={150}
       overlay={
         tooltip
           ?
@@ -14,23 +16,21 @@ function ButtonImg({ imgUrl, title, tooltip, onClick, className, size = 28, font
           : <></>
       }
     >
-      {({ ref, ...triggerHandler }) => (
+      {({ triggerHandler }) => (
         <Button
-          variant="light"
           {...triggerHandler}
-          className={`d-inline-flex align-items-center py-0 ps-0 border-0 shadow-hover background-color-none-hover ${className}`}
-          style={{
-            borderRadius: (size / 2),
-          }}
+          variant="light"
+          className={`d-inline-flex align-items-center py-0 ps-0 border-0 shadow-sm shadow-hover background-color-none-hover ${className}`}
           onClick={onClick}
         >
           <Image
-            ref={ref}
-            roundedCircle
             src={imgUrl}
             height={size}
+            style={{
+              borderRadius: 'var(--bs-border-radius-sm) 0 0 var(--bs-border-radius-sm)'
+            }}
           />
-          <span className="ms-1 fw-bold text-dark" style={{ fontSize: fontSize }}>{title}</span>
+          <span className="ms-2 fw-bold text-third" style={{ fontSize: fontSize }}>{title}</span>
         </Button>
       )}
     </OverlayTrigger>
