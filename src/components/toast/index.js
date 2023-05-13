@@ -1,1 +1,1 @@
-export * from './ToastAutoHide'
+export * from './TooltipCopy'
