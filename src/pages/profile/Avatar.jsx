@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPen } from '@fortawesome/free-solid-svg-icons'
+import { faImage } from '@fortawesome/free-solid-svg-icons'
 import { updateAvatar } from '../../api'
 import { toImgUrl } from '../../utils'
 
@@ -30,65 +30,45 @@ function Avatar({ _id, srcThumbnail }) {
     }
 
     return (
-        <div className='mb-2' style={{ display: 'grid', gridTemplate: '1fr / 1fr', placeItems: 'center' }}>
+        <div onMouseEnter={() => setIsEditingAvatar(true)} style={{
+            position: 'absolute',
+            height: '100px',
+            width: '100px',
+        }}>
             <img
                 src={avatar || srcThumbnail}
-                onMouseEnter={() => setIsEditingAvatar(true)}
-                className="rounded-circle"
-                style={{
-                    objectFit: 'cover',
-                    height: '75px',
-                    width: '75px',
-                    zIndex: 1,
-                    gridColumn: '1 / 1',
-                    gridRow: '1 / 1'
-                }} alt='avatar'
+                className="rounded-3 h-100 w-100"
+                style={{ objectFit: 'cover' }} alt='avatar'
             />
-            {isEditingAvatar
-                ? <div
-                    className="rounded-circle"
-                    onMouseLeave={() => setIsEditingAvatar(false)}
+
+            <label
+                htmlFor="picture"
+                className="rounded-3"
+                onMouseLeave={() => setIsEditingAvatar(false)}
+                style={{
+                    position: 'absolute',
+                    left: 0,
+                    opacity: isEditingAvatar ? 1 : 0,
+                    height: '100px',
+                    width: '100px',
+                    backdropFilter: "blur(4px) brightness(50%)",
+                    transition: 'opacity 0.2s linear',
+                }}
+            >
+                <FontAwesomeIcon
+                    icon={faImage}
+                    className='text-light'
                     style={{
-                        height: '75px',
-                        width: '75px',
-                        zIndex: 2,
-                        gridColumn: '1 / 1',
-                        gridRow: '1 / 1',
-                        backgroundColor: '#00000055'
+                        position: 'inherit',
+                        height: 32,
+                        width: 32,
+                        top: 35,
+                        left: 35
                     }}
-                >
-                    <FontAwesomeIcon
-                        icon={faPen}
-                        className='text-light'
-                        style={{
-                            height: '32px',
-                            width: '32px',
-                            position: 'relative',
-                            top: '20px',
-                            zIndex: 2,
-                            gridColumn: '1 / 1',
-                            gridRow: '1 / 1'
-                        }}
-                    />
-                    <label
-                        htmlFor="picture"
-                        className="rounded-circle"
-                        style={{
-                            position: 'relative',
-                            top: '-45px',
-                            height: '75px',
-                            width: '75px',
-                            zIndex: 3,
-                            gridColumn: '1 / 1',
-                            gridRow: '1 / 1'
-                        }}
-                    >
-                    </label>
-                </div>
-                : null
-            }
+                />
+            </label>
             <input
-                className="rounded-circle"
+                className="rounded-3"
                 type='file'
                 name='picture'
                 id='picture'
@@ -96,7 +76,7 @@ function Avatar({ _id, srcThumbnail }) {
                 hidden
                 accept='image/png, image/jpg, image/jpeg'
             />
-        </div>
+        </div >
     )
 }
 
