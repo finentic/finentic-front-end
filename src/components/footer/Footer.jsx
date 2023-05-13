@@ -1,10 +1,6 @@
 import React from 'react'
-import { useEth } from '../../contexts';
-import { ToastAutoHide } from '../toast';
 
 function Footer() {
-    const { eth } = useEth()
-
     return (
         <footer className="d-flex flex-column bg-primary text-light">
             <div className='container'>
@@ -20,7 +16,7 @@ function Footer() {
                         <p className='fw-bold fs-5 mb-0'>FxEthers</p>
                         <p>Buy, sell, and discover phygital items.</p>
 
-                        <p>FxETH Token Contract: { }
+                        {/* <p>FxETH Token Contract: { }
                             <ToastAutoHide
                                 message='Copy this contract address'
                                 feedback='Copied to clipboard!'
@@ -70,7 +66,7 @@ function Footer() {
                                     content={eth.account}
                                 />
                             </p>
-                        )}
+                        )} */}
 
                     </div>
                     <div className='d-none d-sm-block col-sm text-end'>
