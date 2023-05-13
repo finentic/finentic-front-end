@@ -1,6 +1,7 @@
 import { useState, createContext, useEffect, useCallback, useContext, useMemo } from 'react'
 import { ethers } from "ethers"
 import {
+  BLOCK_EXPLORER_URL,
   DEFAULT_CHAIN,
   RPC_URI,
   collectionFactoryContract,
@@ -25,29 +26,55 @@ function EthProvider({ children }) {
           provider = new ethers.providers.Web3Provider(window.ethereum)
           const accounts = await provider.send("eth_requestAccounts", [])
           signer = provider.getSigner()
-          account = (await getAccount(accounts[0])).data
-      } else {
+          account = getAccount(accounts[0])
+          network = await provider.detectNetwork()
+
+          if (network.chainId !== Number(DEFAULT_CHAIN)) {
+            console.error(
+              'UNSUPPORTED NETWORK CHAIN ID: ',
+              network.chainId,
+              '\nREVERT TO AVALANCHE FUJI TESTNET DEFAULT CHAIN ID:',
+              Number(DEFAULT_CHAIN)
+            )
+            try {
+              await window.ethereum.request({
+                method: 'wallet_switchEthereumChain',
+                params: [{ chainId: '0x' + Number(DEFAULT_CHAIN).toString(16) }],
+              })
+            } catch (switchError) {
+              // This error code indicates that the chain has not been added to MetaMask.
+              if (switchError.code === 4902) await window.ethereum.request({
+                method: 'wallet_addEthereumChain',
+                params: [{
+                  chainId: '0x' + Number(DEFAULT_CHAIN).toString(16),
+                  chainName: 'Fuji (C-Chain)',
+                  rpcUrls: [RPC_URI],
+                  blockExplorerUrls: [BLOCK_EXPLORER_URL],
+                  nativeCurrency: {
+                    name: "AVAX",
+                    symbol: "AVAX",
+                    decimals: 18
+                  },
+                }],
+              })
+            }
+          }
+        } else {
           provider = new ethers.providers.JsonRpcProvider(RPC_URI)
         }
-        network = await provider.detectNetwork()
-        const signerContract = signer || provider
 
-        ControlCenterContract = controlCenterContract(signerContract)
-        CollectionFactoryContract = collectionFactoryContract(signerContract)
-        MarketplaceContract = marketplaceContract(signerContract)
-        SharedContract = sharedContract(signerContract)
-        VietnameseDong = vietnameseDong(signerContract)
-
-        // eslint-disable-next-line eqeqeq
-        if (network.chainId != DEFAULT_CHAIN) console.error(
-          'UNSUPPORTED NETWORK CHAIN ID: ',
-          network.chainId,
-          '\nREVERT TO AVALANCHE FUJI TESTNET DEFAULT CHAIN ID:',
-          Number(DEFAULT_CHAIN)
-        )
+        const contractProvider = signer || provider
+        ControlCenterContract = controlCenterContract(contractProvider)
+        CollectionFactoryContract = collectionFactoryContract(contractProvider)
+        MarketplaceContract = marketplaceContract(contractProvider)
+        SharedContract = sharedContract(contractProvider)
+        VietnameseDong = vietnameseDong(contractProvider)
       } catch (err) {
         console.error(err)
       }
+
+      account = (await account).data
+
       setEth({
         provider,
         account,
