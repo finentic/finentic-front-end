@@ -1,4 +1,5 @@
 import 'bootstrap/dist/css/bootstrap.min.css'
+import 'cooltipz-css';
 import 'react-loading-skeleton/dist/skeleton.css'
 import './App.scss'
 import { EthProvider } from './contexts'

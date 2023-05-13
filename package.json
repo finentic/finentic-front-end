@@ -13,6 +13,7 @@
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.3.2",
     "bootstrap": "^5.2.2",
+    "cooltipz-css": "^2.2.2",
     "ethers": "^5.7.2",
     "localforage": "^1.10.0",
     "match-sorter": "^6.3.1",
