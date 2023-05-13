@@ -14,7 +14,9 @@ $theme-colors: (
   "cyan": #00ade8,
   "success": #198754,
   "light": #f8f9fa,
+  "grey": #e5e8eb,
   "secondary": #6c757d,
+  "third": #353840,
   "dark": #212529,
 );
 
@@ -45,6 +47,50 @@ $theme-colors: (
 
 .background-color-none-hover:hover {
   background-color: #f8f9fa !important;
+}
+
+.cooltipz-bg-color {
+  --cooltipz-bg-color: #f8f9fa;
+  --cooltipz-border-color: #f8f9fa;
+  --cooltipz-text-color: #212529;
+}
+
+.cooltipz-bg-color-dark {
+  --cooltipz-bg-color: #212529;
+  --cooltipz-border-color: #212529;
+  --cooltipz-text-color: #f8f9fa;
+}
+
+.accordion-button {
+  font-weight: 400;
+  color: #353840 !important;
+  background-color: #f8f9fa !important;
+}
+
+.accordion-button:focus {
+  border: none;
+  box-shadow: inset 0 calc(-1 * var(--bs-accordion-border-width)) 0 var(--bs-accordion-border-color) !important;
+}
+
+.accordion-button:not(.collapsed) {
+  border: none;
+  color: #353840 !important;
+  background-color: #fff !important;
+}
+
+.input-transparent {
+  border: none;
+  outline: none;
+  background-color: transparent;
+}
+
+.input-transparent:focus {
+  border: none;
+  outline: none;
+}
+
+#collasible-nav-dropdown {
+  padding: 0 !important;
 }
 
 @import "~bootstrap/scss/bootstrap.scss";
