@@ -1,13 +1,10 @@
 import { useState } from 'react'
-import { Nav, Navbar, NavDropdown, Container } from 'react-bootstrap'
+import { Nav, Navbar, NavDropdown, Container, Image } from 'react-bootstrap'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSearch } from '@fortawesome/free-solid-svg-icons'
+import { faPen, faSearch, faWallet, faUser, faGear, faRightFromBracket, faPlug } from '@fortawesome/free-solid-svg-icons'
 import { useNavigate } from 'react-router-dom'
 import { useEth } from '../../contexts'
-
-function addressOverflow(address) {
-    return `${address.substr(0, 3)}...${address.substr(39, 42)}`
-}
+import { formatHexString, toImgUrl } from '../../utils'
 
 function NavigationBar(props) {
     const { eth } = useEth()
@@ -20,8 +17,12 @@ function NavigationBar(props) {
                     <img
                         src="/logo/brand_V.png"
                         alt="FINENTIC"
-                        height="40"
+                        height="36"
                         className="d-inline-block align-top"
+                        draggable={false}
+                        style={{
+                            borderRadius: 'var(--bs-border-radius-sm) 0 0 var(--bs-border-radius-sm)'
+                        }}
                     />
                 </Navbar.Brand>
                 <Navbar.Toggle aria-controls="responsive-navbar-nav" onClick={() => setExpanded(!expanded)} />
@@ -47,51 +48,52 @@ function NavigationBar(props) {
                     <Nav className="col"></Nav>
 
                     <Nav>
-                        <Nav.Link
-                            className='fw-bold me-4'
-                            onClick={() => {
-                                navigate('/create')
-                                setExpanded(false)
-                            }}>
-                            Create
-                        </Nav.Link>
-                        <Nav.Link
-                            onClick={() => {
-                                setExpanded(false)
-                                navigate('/checkRawData')
-                            }}
-                            className='fw-bold me-4'>
-                            Check
-                        </Nav.Link>
                         {(eth.account && eth.account._id !== '0x0000000000000000000000000000000000000000')
                             ? <NavDropdown
-                                className='fw-bold'
-                                title={addressOverflow(eth.account._id)}
-                                id="collasible-nav-dropdown">
-                                <NavDropdown.Item
-                                    onClick={() => {
-                                        setExpanded(false)
-                                        navigate('/account/' + eth.account._id)
-                                    }}> Profile </NavDropdown.Item>
-                                <NavDropdown.Item
-                                    onClick={() => {
-                                        setExpanded(false)
-                                        navigate('/setting')
-                                    }}> Setting
+                                className='rounded-2 px-4 py-1'
+                                title={eth.account.name}
+                                id="collasible-nav-dropdown"
+                                style={{
+                                    backgroundImage: `url(${toImgUrl(eth.account.thumbnail)})`,
+                                    backgroundRepeat: 'no-repeat',
+                                    backgroundSize: 'cover',
+                                }}
+                            >
+                                <NavDropdown.Item onClick={() => {
+                                    setExpanded(false)
+                                    navigate('/create')
+                                }}>
+                                    <FontAwesomeIcon icon={faPen} className='text-third pe-2' /> Create
                                 </NavDropdown.Item>
-                                <NavDropdown.Divider />
-                                <NavDropdown.Item
-                                    onClick={() => {
-                                        setExpanded(false)
-                                        props.logout()
-                                    }}> Logout </NavDropdown.Item>
-                            </NavDropdown>
-                            : <Nav.Link
-                                className='fw-bold me-4'
-                                onClick={() => {
+
+                                <NavDropdown.Item onClick={() => {
                                     setExpanded(false)
                                     navigate('/account/' + eth.account._id)
-                                }}> Login
+                                }}>
+                                    <FontAwesomeIcon icon={faUser} className='text-third pe-2' /> Profile
+                                </NavDropdown.Item>
+
+                                <NavDropdown.Item onClick={() => {
+                                    setExpanded(false)
+                                    navigate('/setting')
+                                }}>
+                                    <FontAwesomeIcon icon={faGear} className='text-third pe-2' /> Setting
+                                </NavDropdown.Item>
+
+                                <NavDropdown.Divider />
+
+                                <NavDropdown.Item onClick={() => {
+                                    setExpanded(false)
+                                    props.logout()
+                                }}>
+                                    <FontAwesomeIcon icon={faRightFromBracket} className='text-third pe-2' /> Disconnect
+                                </NavDropdown.Item>
+                            </NavDropdown>
+                            : <Nav.Link className='fw-bold me-4' onClick={() => {
+                                setExpanded(false)
+                                navigate('/account/' + eth.account._id)
+                            }}>
+                                <FontAwesomeIcon icon={faPlug} className='text-third pe-2' /> Connect
                             </Nav.Link>
                         }
                     </Nav>
