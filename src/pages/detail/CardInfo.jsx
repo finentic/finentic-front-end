@@ -4,7 +4,7 @@ import { Accordion } from "react-bootstrap"
 const CardInfo = ({ children, maxHeight, className, title, icon, defaultActive }) => {
     return (
         <div className='py-3'>
-            <div className={`rounded-3 shadow h-100 w-100 ${className}`} style={maxHeight ?? { maxHeight: maxHeight, }}>
+            <div className={`rounded-3 h-100 w-100 ${className}`} style={maxHeight ?? { maxHeight: maxHeight, }}>
                 <Accordion defaultActiveKey={defaultActive && title}>
                     <Accordion.Item eventKey={title}>
                         {title && (
@@ -15,7 +15,7 @@ const CardInfo = ({ children, maxHeight, className, title, icon, defaultActive }
                                 </span>
                             </Accordion.Header>
                         )}
-                        <Accordion.Body>
+                        <Accordion.Body className='bg-light'>
                             {children}
                         </Accordion.Body>
                     </Accordion.Item>

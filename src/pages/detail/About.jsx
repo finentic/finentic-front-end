@@ -1,43 +1,104 @@
-import { ToastAutoHide } from "../../components"
-import { toRawUrl } from "../../utils"
+import { TooltipCopy } from "../../components"
+import { toTokenId, toAddressUrl, toRawUrl, timestampToDate, formatHexString } from "../../utils"
 
 const About = ({ item }) => {
     return (
-        <p>
-            <strong className='text-dark pe-2'>From collection:</strong>
-            <ToastAutoHide
-                message='Copy'
-                feedback='Copied!'
-                title={item.from_collection.name}
-                content={item.from_collection._id}
-           /><br/>
-            <strong className='text-dark pe-2'>Create at: </strong>
-            {(item.createdAt).substring(0, 10)}
-            <br/>
-            <strong className='text-dark pe-2'>External URL:</strong>
-            <a
-                className='overflow-hidden text-wrap text-break text-secondary'
-                href={item.external_url}
-            >
-                {item.external_url}
-            </a><br/>
+        <div>
+            <div className="float-start">
+                <strong className='text-third pe-2'>
+                    Contract:
+                </strong>
+            </div>
+            <div className="float-end">
+                <TooltipCopy
+                    contentLink={toAddressUrl(item.from_collection._id)}
+                    contentCopy={item.from_collection._id}
+                >
+                    {item.from_collection.name}
+                </TooltipCopy>
+            </div>
+            <br />
 
-            <strong className='text-dark pe-2'>Raw data url:</strong><br/>
-            <a
-                className='text-break text-secondary'
-                href={toRawUrl(item._id)}
-            >
-                {toRawUrl(item._id)}
-            </a><br/>
-            <strong className='text-dark pe-2'>Raw data hash:</strong><br/>
-            <span className='text-secondary'>
-                <ToastAutoHide
-                    message='Copy'
-                    feedback='Copied!'
+            <div className="float-start">
+                <strong className='text-third pe-2'>
+                    Token ID:
+                </strong>
+            </div>
+            <div className="float-end">
+                #{toTokenId(item._id)}
+            </div>
+            <br />
+
+            <div className="float-start">
+                <strong className='text-third pe-2'>
+                    Token standard:
+                </strong>
+            </div>
+            <div className="float-end">
+                ERC-721
+            </div>
+            <br />
+
+            <div className="float-start">
+                <strong className='text-third pe-2'>
+                    Create at:
+                </strong>
+            </div>
+            <div className="float-end">
+                {timestampToDate(item.createdAt)}
+            </div>
+            <br />
+
+            {item.external_url && <>
+                <div className="float-start">
+                    <strong className='text-third pe-2'>
+                        External URL:
+                    </strong>
+                </div>
+                <div className="float-end">
+                    <a
+                        className='overflow-hidden text-wrap text-break text-secondary'
+                        href={item.external_url}
+                    >
+                        {item.external_url}
+                    </a>
+                </div>
+                <br />
+            </>}
+
+            <div className="float-start">
+                <strong className='text-third pe-2'>
+                    Raw data url:
+                </strong>
+            </div>
+            <div className="float-end">
+                <TooltipCopy
+                    className='text-break text-secondary'
+                    contentLink={toRawUrl(item._id)}
+                    contentLinkTooltip='Open in new tab'
+                    contentCopy={item.from_collection._id}
+                >
+                    {formatHexString(item._id, 5, 8)}
+                </TooltipCopy>
+            </div>
+            <br />
+
+            <div className="float-start">
+                <strong className='text-third pe-2'>
+                    Raw data hash:
+                </strong>
+            </div>
+            <div className="float-end">
+                <TooltipCopy
                     title={item.hashed_metadata}
-                    content={item.hashed_metadata}/>
-            </span>
-        </p>
+                    contentCopy={item.hashed_metadata}
+                    className='text-secondary'
+                >
+                    {formatHexString(item.hashed_metadata, 5, 8)}
+                </TooltipCopy>
+            </div>
+            <br />
+        </div >
     )
 }
 
