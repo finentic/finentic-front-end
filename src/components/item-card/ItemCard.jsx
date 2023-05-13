@@ -1,7 +1,9 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { toImgUrl, formatPrice, ITEM_STATE } from '../../utils'
+import { toImgUrl, formatPrice, ITEM_STATE, ACCOUNT_STATE } from '../../utils'
 import { ButtonImg } from '../button-img'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCircleCheck } from '@fortawesome/free-solid-svg-icons'
 
 
 function ItemCard({ item }) {
@@ -17,11 +19,8 @@ function ItemCard({ item }) {
         navigate(`/item/${item._id}`)
     }
     return (
-        <div
-            className='col-12 col-sm-6 col-lg-4 col-xl-3 mb-4'
-            onClick={handleOnClick}
-        >
-            <div className='card rounded-3 shadow-sm shadow-hover'>
+        <div className='col-12 col-sm-6 col-lg-4 col-xl-3 mb-4'        >
+            <div className='card rounded-3 shadow-sm shadow-hover cursor-pointer' onClick={handleOnClick}>
                 <div
                     onMouseEnter={handleOnMouseEnter}
                     onMouseLeave={handleOnMouseLeave}
@@ -76,11 +75,8 @@ function ItemCard({ item }) {
                                     }}
                                 />
                                 <div
-                                    style={{
-                                        position: 'absolute',
-                                        bottom: 0,
-                                    }}
-                                    className="h5 text-nowrap text-light fw-bold"
+                                    style={{ position: 'absolute', bottom: 0 }}
+                                    className="h5 text-light fw-bold"
                                 >
                                     {item.name}
                                 </div>
@@ -92,9 +88,13 @@ function ItemCard({ item }) {
                 <div className="card-body p-2">
                     <ButtonImg
                         imgUrl={toImgUrl(item.owner.thumbnail)}
-                        title={item.owner.name}
-                        size={20}
-                        className='bg-light-50'
+                        title={<>
+                            {item.owner.name} {(item.owner.status === ACCOUNT_STATE.VERIFIED) && <FontAwesomeIcon
+                                icon={faCircleCheck}
+                                className='text-primary ps-1 pt-1'
+                            />}
+                        </>}
+                        className='text-secondary'
                         onClick={event => {
                             event.stopPropagation()
                             navigate(`/account/${item.owner._id}`)
