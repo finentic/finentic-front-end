@@ -1,7 +1,7 @@
 import { commify } from "ethers/lib/utils"
 import { PERCENTAGE, toBN } from "../../utils"
 
-const ListingSummary = ({ listingForm }) => {
+const ListingSummary = ({ listingForm, serviceFeePercent }) => {
     const price = toBN(listingForm.price.replaceAll(',', ''))
     return (
         <div className='py-3'>
@@ -21,7 +21,7 @@ const ListingSummary = ({ listingForm }) => {
                     Service fee
                 </div>
                 <div className='col-6 text-end'>
-                    0.01 %
+                    {commify((serviceFeePercent * 100 / PERCENTAGE))} %
                 </div>
             </div>
             <hr className='hr' />
@@ -30,7 +30,7 @@ const ListingSummary = ({ listingForm }) => {
                     Total potential earnings
                 </div>
                 <div className='col-6 text-end'>
-                    {commify(price.sub(price.mul('1').div(PERCENTAGE)))} VND
+                    {commify(price.sub(price.mul(serviceFeePercent).div(PERCENTAGE)))} VND
                 </div>
             </div>
         </div>

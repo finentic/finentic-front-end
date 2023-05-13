@@ -1,6 +1,9 @@
+import { forwardRef } from "react"
 import { Dropdown, DropdownButton, Form, InputGroup } from "react-bootstrap"
 
-const ListingFixedPrice = ({ listingForm, handleInputChange }) => {
+const ListingFixedPrice = forwardRef((
+    { listingForm, handleInputChange }, ref
+) => {
     return (
         <>
             <div className='form-group py-3'>
@@ -18,6 +21,7 @@ const ListingFixedPrice = ({ listingForm, handleInputChange }) => {
                         type='text'
                         value={listingForm.price}
                         onChange={handleInputChange}
+                        ref={ref}
                     />
                     <DropdownButton
                         variant="outline-secondary"
@@ -32,6 +36,6 @@ const ListingFixedPrice = ({ listingForm, handleInputChange }) => {
             </div>
         </>
     )
-}
+})
 
 export default ListingFixedPrice

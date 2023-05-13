@@ -1,6 +1,12 @@
+import { forwardRef } from "react"
 import { Dropdown, DropdownButton, Form, InputGroup } from "react-bootstrap"
 
-const ListingAuction = ({ listingForm, handleInputChange, datetimeStart, datetimeEnded }) => {
+const ListingAuction = forwardRef(({
+    listingForm,
+    handleInputChange,
+    datetimeStart,
+    datetimeEnded,
+}, ref) => {
     return (
         <>
             <div className='form-group py-3'>
@@ -18,6 +24,7 @@ const ListingAuction = ({ listingForm, handleInputChange, datetimeStart, datetim
                         type='text'
                         onChange={handleInputChange}
                         value={listingForm.price}
+                        ref={ref}
                     />
                     <DropdownButton
                         variant="outline-secondary"
@@ -71,6 +78,6 @@ const ListingAuction = ({ listingForm, handleInputChange, datetimeStart, datetim
             </div>
         </>
     )
-}
+})
 
 export default ListingAuction

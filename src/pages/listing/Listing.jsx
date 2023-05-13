@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react'
+import { createRef, useEffect, useState } from 'react'
 import { usePageTitle } from '../../hooks'
 import { ButtonSubmit } from '../../components'
 import { useEth } from '../../contexts'
-import { BUTTON_STATE, ITEM_STATE, MARKETPLACE_ADDRESS, SHARED_ADDRESS, VIETNAMESE_DONG_ADDRESS, getTokenIdFromItemId } from '../../utils'
+import { BUTTON_STATE, ITEM_STATE, MARKETPLACE_ADDRESS, SHARED_ADDRESS, VIETNAMESE_DONG_ADDRESS, toTokenId } from '../../utils'
 import { getItemById } from '../../api'
 import { useNavigate, useParams } from 'react-router-dom'
 import { commify, parseEther } from 'ethers/lib/utils'
@@ -19,12 +19,16 @@ function Listing({ pageTitle }) {
   const { eth } = useEth()
   const navigate = useNavigate()
   const [itemDetail, setItemDetail] = useState(false)
+  const [serviceFeePercent, setServiceFeePercent] = useState('1')
 
   useEffect(() => {
     const getItemList = async () => {
       try {
         const item = await getItemById(itemId)
-        console.log(item)
+        if (eth.MarketplaceContract) {
+          const marketServiceFeePercent = await eth.MarketplaceContract.serviceFeePercent()
+          setServiceFeePercent(marketServiceFeePercent)
+        }
         setItemDetail(item.data)
       } catch (error) {
         console.error(error)
@@ -32,17 +36,18 @@ function Listing({ pageTitle }) {
     }
     getItemList()
     return () => setItemDetail(false)
-  }, [itemId])
+  }, [eth.MarketplaceContract, itemId])
   if (!itemDetail) return null
   const isOwner = (itemDetail.owner._id.toLowerCase() === eth.account._id.toLowerCase())
   if (!isOwner || itemDetail.state !== ITEM_STATE.CREATED) navigate(`/item/${itemDetail._id}`)
   return (<ListForSale
     item={itemDetail}
     key={itemDetail._id}
+    serviceFeePercent={serviceFeePercent}
   />)
 }
 
-function ListForSale({ item }) {
+function ListForSale({ item, serviceFeePercent }) {
   const datetimeStart = new Date()
   const datetimeEnded = new Date()
   datetimeStart.setMinutes(datetimeStart.getMinutes() - datetimeStart.getTimezoneOffset() + 1)
@@ -50,7 +55,9 @@ function ListForSale({ item }) {
 
   const { eth } = useEth()
   const navigate = useNavigate()
+  const ref = createRef();
   const [buttonState, setButtonState] = useState(BUTTON_STATE.ENABLE)
+  const [cursor, setCursor] = useState(0)
   const [listingForm, setListingForm] = useState({
     method: 'fixed',
     startTime: datetimeStart.toISOString().slice(0, 16),
@@ -58,6 +65,11 @@ function ListForSale({ item }) {
     price: '0',
     gap: '1',
   })
+
+  useEffect(() => {
+    const input = ref.current
+    if (input) input.setSelectionRange(cursor, cursor)
+  }, [ref, cursor, listingForm.price])
 
   const handleInputChange = event => {
     const target = event.target
@@ -67,8 +79,11 @@ function ListForSale({ item }) {
     if (name === 'price') {
       if (!value || Number(value) < 1) value = '0'
       const price = value.replaceAll(',', '')
-      if (!/^[0-9]+$/.test(price)) return;
+      if (!/^[0-9]+$/.test(price) || price.length > (78 - 18)) return;
       value = commify(price)
+      const offsetValue = (value.length - 1 - listingForm.price.length)
+      const offsetCursor = (offsetValue < -2) ? -1 : 0
+      setCursor(event.target.selectionStart + (offsetValue < 0 ? offsetCursor : offsetValue))
     }
     setListingForm({ ...listingForm, [name]: value })
   }
@@ -83,31 +98,42 @@ function ListForSale({ item }) {
     const startTime = new Date(listingForm.startTime).getTime() / 1000
     const endTime = new Date(listingForm.endTime).getTime() / 1000
     try {
-      const getApproved = await eth.SharedContract.getApproved(getTokenIdFromItemId(item._id))
+      const getApproved = await eth.SharedContract.getApproved(toTokenId(item._id))
       const isApprovedForAll = await eth.SharedContract.isApprovedForAll(eth.account._id, MARKETPLACE_ADDRESS)
       if (!(getApproved.toLowerCase() === MARKETPLACE_ADDRESS.toLowerCase() || isApprovedForAll)) {
-        await eth.SharedContract.approve(MARKETPLACE_ADDRESS, getTokenIdFromItemId(item._id))
+        await eth.SharedContract.approve(MARKETPLACE_ADDRESS, toTokenId(item._id))
         eth.SharedContract.on('Approval', async (owner) => (owner.toLowerCase() === eth.account._id) && setButtonState(BUTTON_STATE.DONE))
       } else {
-        if (listingForm.method === 'fixed') await eth.MarketplaceContract.listForBuyNow(
-          SHARED_ADDRESS,
-          getTokenIdFromItemId(item._id),
-          item.is_phygital,
-          VIETNAMESE_DONG_ADDRESS,
-          price,
-        )
-        else await eth.MarketplaceContract.listForAuction(
-          SHARED_ADDRESS,
-          getTokenIdFromItemId(item._id),
-          item.is_phygital,
-          startTime,
-          endTime,
-          VIETNAMESE_DONG_ADDRESS,
-          price,
-          '1',
-        )
-        setButtonState(BUTTON_STATE.DONE)
-        navigate(`/item/${item._id}`)
+        if (listingForm.method === 'fixed') {
+          eth.MarketplaceContract.on('ListForBuyNow',
+            (nftContract, tokenId) => (
+              nftContract === SHARED_ADDRESS && tokenId.toString() === toTokenId(item._id)
+            ) && navigate(`/item/${item._id}`)
+          )
+          await eth.MarketplaceContract.listForBuyNow(
+            SHARED_ADDRESS,
+            toTokenId(item._id),
+            item.is_phygital,
+            VIETNAMESE_DONG_ADDRESS,
+            price,
+          )
+        } else {
+          await eth.MarketplaceContract.listForAuction(
+            SHARED_ADDRESS,
+            toTokenId(item._id),
+            item.is_phygital,
+            startTime,
+            endTime,
+            VIETNAMESE_DONG_ADDRESS,
+            price,
+            '1',
+          )
+          eth.MarketplaceContract.on('ListForAuction',
+            (nftContract, tokenId) => (
+              nftContract === SHARED_ADDRESS && tokenId.toString() === toTokenId(item._id)
+            ) && navigate(`/item/${item._id}`)
+          )
+        }
       }
     } catch (error) {
       console.error(error)
@@ -128,6 +154,7 @@ function ListForSale({ item }) {
           {(listingForm.method === 'fixed') && (
             <ListingFixedPrice
               listingForm={listingForm}
+              ref={ref}
               handleInputChange={handleInputChange}
             />
           )}
@@ -138,9 +165,10 @@ function ListForSale({ item }) {
               datetimeEnded={datetimeEnded}
               listingForm={listingForm}
               handleInputChange={handleInputChange}
+              ref={ref}
             />
           )}
-          <ListingSummary listingForm={listingForm} />
+          <ListingSummary listingForm={listingForm} serviceFeePercent={serviceFeePercent} />
 
           <div className='py-2'>
             <ButtonSubmit
