@@ -29,6 +29,10 @@ $theme-colors: (
   cursor: pointer;
 }
 
+.cursor-text:hover {
+  cursor: text;
+}
+
 .shadow-hover {
   transition: opacity 0.2s linear;
 }
