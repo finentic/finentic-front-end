@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom"
 import {
   Create,
   Error404,
@@ -10,34 +10,44 @@ import {
   TokenSale,
   Edit,
   Profile,
-} from "../pages";
-import { NavigationBar } from "../components";
+} from "../pages"
+import { NavigationBar } from "../components"
+
+const ROUTERS_PATH = {
+  home: 'home/',
+  create: 'create/',
+  item: 'item/',
+  account: 'account/',
+  error500: 'error-500/',
+  error503: 'error-500/',
+  error404: 'error-404/',
+}
 
 const MainRoutes = () => {
   return (
     <>
       <NavigationBar />
-      <div style={{ marginTop: "66px" }} className="bg-light">
+      <div style={{ marginTop: "50px" }} className="bg-light">
         <Routes >
           <Route path="/">
             <Route index element={<Home pageTitle="Home" />} />
-            <Route path="home" element={<Navigate to="home" replace />} />
+            <Route path={ROUTERS_PATH.home} element={<Navigate to="/" replace />} />
             <Route path="tokenSale" element={<TokenSale pageTitle="Buy FxETH" />} />
-            <Route path="create" element={<Create pageTitle="Create NFT" />} />
-            <Route path="item/:itemId" element={<ItemDetail pageTitle="Detail" />} />
-            <Route path="item/:itemId/listing" element={<Listing pageTitle="List for sale" />} />
-            <Route path="item/:itemId/edit" element={<Edit pageTitle="Edit item" />} />
-            <Route path="account/:accountId" element={<Profile pageTitle="Account profile" />} />
+            <Route path={ROUTERS_PATH.create} element={<Create pageTitle="Create NFT" />} />
+            <Route path={`${ROUTERS_PATH.item}:itemId`} element={<ItemDetail pageTitle="Detail" />} />
+            <Route path={`${ROUTERS_PATH.item}:itemId/listing`} element={<Listing pageTitle="List for sale" />} />
+            <Route path={`${ROUTERS_PATH.item}:itemId/edit`} element={<Edit pageTitle="Edit item" />} />
+            <Route path={`${ROUTERS_PATH.account}:accountId`} element={<Profile pageTitle="Account profile" />} />
 
             {/* for error routes */}
             <Route path="*" element={<Error404 pageTitle="Not found" />} />
-            <Route path="error-500" element={<Error500 pageTitle="Internal server error" />} />
-            <Route path="error-503" element={<Error503 pageTitle="Service temporarily unavailable" />} />
+            <Route path={ROUTERS_PATH.error500} element={<Error500 pageTitle="Internal server error" />} />
+            <Route path={ROUTERS_PATH.error503} element={<Error503 pageTitle="Service temporarily unavailable" />} />
           </Route>
         </Routes>
       </div>
     </>
-  );
-};
+  )
+}
 
-export default MainRoutes;
+export { MainRoutes, ROUTERS_PATH }
