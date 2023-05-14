@@ -32,7 +32,7 @@ const LISTING_TITLE = {
 }
 
 
-function Trading({ item, eth, isOwner, getItemDetail }) {
+function Trading({ item, eth, isOwner }) {
     const ref = useRef(null)
     const [buttonState, setButtonState] = useState(BUTTON_STATE.ENABLE)
     const [cursor, setCursor] = useState(0)

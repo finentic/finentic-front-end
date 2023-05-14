@@ -5,7 +5,6 @@ import {
 } from '../../utils'
 import {
   faChain,
-  faClockRotateLeft,
   faIdCard,
   faList,
   faReceipt,
@@ -34,54 +33,50 @@ import PriceHistory from './PriceHistory';
 function ItemDetail({ pageTitle }) {
   const { eth } = useEth()
   const { itemId } = useParams()
+  const navigate = useNavigate()
   usePageTitle(pageTitle)
   const [itemDetail, setItemDetail] = useState({})
 
-  const getItemDetail = async (_itemId) => {
-    try {
-      const item = await getItemById(_itemId)
-      console.log(item.data)
-      setItemDetail({ ...itemDetail, ...item.data })
-    } catch (error) { console.error(error) }
-  }
-
   useEffect(() => {
-    getItemDetail(itemId)
-    return () => setItemDetail(false)
-  }, [itemId])
-
-  useEffect(() => {
-    if (eth.MarketplaceContract) {
+    if (eth.MarketplaceContract && (itemId !== itemDetail._id)) {
+      const getItemDetail = async () => {
+        const item = await getItemById(itemId)
+        console.log(item.data)
+        if (item.data === null) navigate('/404')
+        setItemDetail({ ...itemDetail, ...item.data })
+      }
+      getItemDetail()
       eth.MarketplaceContract.on(
         'BiddingForAuction',
         async (nftContract, tokenId) => (
           nftContract.toLowerCase() === eth.SharedContract.address.toLowerCase() &&
           tokenId.toString() === toTokenId(itemId)
-        ) && getItemDetail(itemId)
+        ) && getItemDetail()
       )
       eth.MarketplaceContract.on(
         'Invoice',
         async (_buyer, _seller, nftContract, tokenId) => (
           nftContract.toLowerCase() === eth.SharedContract.address.toLowerCase() &&
           tokenId.toString() === toTokenId(itemId)
-        ) && getItemDetail(itemId)
+        ) && getItemDetail()
       )
       eth.MarketplaceContract.on(
         'RemoveItemForBuyNow',
         async (nftContract, tokenId) => (
           nftContract.toLowerCase() === eth.SharedContract.address.toLowerCase() &&
           tokenId.toString() === toTokenId(itemId)
-        ) && getItemDetail(itemId)
+        ) && getItemDetail()
       )
       return () => eth.MarketplaceContract.removeAllListeners()
     }
-  }, [eth])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [eth.MarketplaceContract, itemId])
 
   if (!itemDetail._id || !eth.account) return null
-  return (<Detail item={itemDetail} key={itemDetail._id} getItemDetail={getItemDetail} />)
+  return (<Detail item={itemDetail} key={itemDetail._id} />)
 }
 
-function Detail({ item, getItemDetail }) {
+function Detail({ item }) {
   const { eth } = useEth()
   const navigate = useNavigate()
   usePageTitle(item.name)
@@ -237,7 +232,7 @@ function Detail({ item, getItemDetail }) {
             ownership_history={item.ownership_history}
           />
 
-          <Trading item={item} isOwner={isOwner} eth={eth} getItemDetail={getItemDetail} />
+          <Trading item={item} isOwner={isOwner} eth={eth} />
 
           <CardInfo icon={faReceipt} title='Price History' defaultActive>
             <PriceHistory
