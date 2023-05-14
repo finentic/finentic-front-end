@@ -1,23 +1,22 @@
 import { useState } from 'react'
-import { Nav, Navbar, NavDropdown, Container, Image } from 'react-bootstrap'
+import { Nav, Navbar, NavDropdown, Container } from 'react-bootstrap'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPen, faSearch, faWallet, faUser, faGear, faRightFromBracket, faPlug } from '@fortawesome/free-solid-svg-icons'
 import { useNavigate } from 'react-router-dom'
 import { useEth } from '../../contexts'
-import { formatHexString, toImgUrl } from '../../utils'
 
 function NavigationBar(props) {
     const { eth } = useEth()
     const navigate = useNavigate()
     const [expanded, setExpanded] = useState(false);
     return (
-        <Navbar expand="lg" bg="white" fixed="top" className='shadow-sm' expanded={expanded} >
+        <Navbar expand="lg" bg="white" fixed="top" className='shadow-sm' expanded={expanded} style={{ height: 50 }}>
             <Container>
-                <Navbar.Brand onClick={() => navigate('/')} className='fw-bold fs-4 cursor-pointer'>
+                <Navbar.Brand onClick={() => navigate('/')} className='cursor-pointer'>
                     <img
                         src="/logo/brand_V.png"
                         alt="FINENTIC"
-                        height="36"
+                        height="32"
                         className="d-inline-block align-top"
                         draggable={false}
                         style={{
@@ -42,7 +41,7 @@ function NavigationBar(props) {
                             }}
                         >
                             <label className="input-group-text bg-white" htmlFor='search'><FontAwesomeIcon icon={faSearch} /></label>
-                            <input type="search" className="form-control" name='search' id='search' placeholder="Find index, item name, and address" />
+                            <input type="search" className="form-control form-control-sm" name='search' id='search' placeholder="Find index, item name, and address" />
                         </form>
                     </Nav>
                     <Nav className="col"></Nav>
@@ -50,14 +49,9 @@ function NavigationBar(props) {
                     <Nav>
                         {(eth.account && eth.account._id !== '0x0000000000000000000000000000000000000000')
                             ? <NavDropdown
-                                className='rounded-2 px-4 py-1'
-                                title={eth.account.name}
+                                className='rounded-2 fw-bold'
+                                title={<><FontAwesomeIcon icon={faWallet} className='pe-2' /> {eth.account.name}</>}
                                 id="collasible-nav-dropdown"
-                                style={{
-                                    backgroundImage: `url(${toImgUrl(eth.account.thumbnail)})`,
-                                    backgroundRepeat: 'no-repeat',
-                                    backgroundSize: 'cover',
-                                }}
                             >
                                 <NavDropdown.Item onClick={() => {
                                     setExpanded(false)
