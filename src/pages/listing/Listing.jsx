@@ -16,7 +16,7 @@ import ListingOptions from './ListingOptions'
 function Listing({ pageTitle }) {
   usePageTitle(pageTitle)
   const { itemId } = useParams()
-  const { eth } = useEth()
+  const eth = useEth()
   const navigate = useNavigate()
   const [itemDetail, setItemDetail] = useState(false)
   const [serviceFeePercent, setServiceFeePercent] = useState('1')
@@ -37,6 +37,7 @@ function Listing({ pageTitle }) {
     getItemList()
     return () => setItemDetail(false)
   }, [eth.MarketplaceContract, itemId])
+  
   if (!itemDetail) return null
   const isOwner = (itemDetail.owner._id.toLowerCase() === eth.account._id.toLowerCase())
   if (!isOwner || itemDetail.state !== ITEM_STATE.CREATED) navigate(`/item/${itemDetail._id}`)
@@ -53,7 +54,7 @@ function ListForSale({ item, serviceFeePercent }) {
   datetimeStart.setMinutes(datetimeStart.getMinutes() - datetimeStart.getTimezoneOffset() + 1)
   datetimeEnded.setMinutes(datetimeEnded.getMinutes() - datetimeEnded.getTimezoneOffset() + 62)
 
-  const { eth } = useEth()
+  const eth = useEth()
   const navigate = useNavigate()
   const ref = createRef();
   const [buttonState, setButtonState] = useState(BUTTON_STATE.ENABLE)

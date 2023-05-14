@@ -31,7 +31,7 @@ import OwnershipHistory from './OwnershipHistory';
 import PriceHistory from './PriceHistory';
 
 function ItemDetail({ pageTitle }) {
-  const { eth } = useEth()
+  const eth = useEth()
   const { itemId } = useParams()
   const navigate = useNavigate()
   usePageTitle(pageTitle)
@@ -77,7 +77,7 @@ function ItemDetail({ pageTitle }) {
 }
 
 function Detail({ item }) {
-  const { eth } = useEth()
+  const eth = useEth()
   const navigate = useNavigate()
   usePageTitle(item.name)
   const isOwner = (item.owner._id.toLowerCase() === eth.account._id.toLowerCase())

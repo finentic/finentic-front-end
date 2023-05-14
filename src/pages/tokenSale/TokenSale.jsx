@@ -18,7 +18,7 @@ function TokenSale(props) {
   const [addressBeneficiary, setAddressBeneficiary] = useState('')
   const [buttonWhiteListState, setButtonWhiteListState] = useState(BUTTON_STATE.DISABLE)
   const [buttonBuyNowState, setButtonBuyNowState] = useState(BUTTON_STATE.DISABLE)
-  const { eth } = useEth()
+  const eth = useEth()
 
   const calcTokenAmount = async (amountInWei, FxTokenSaleContract) => {
     try {

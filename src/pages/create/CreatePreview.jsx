@@ -10,7 +10,7 @@ const CreatePreview = ({ nftFormData, pictures, eth }) => {
     const navigate = useNavigate()
     return (
         <>
-            <div className='pb-2 px-1'>
+            <div className='pb-2 px-1 user-select-none'>
                 <h3 className="col col-12 pt-2 fw-bold text-third">
                     {nftFormData.name || 'Preview'}
                 </h3>
@@ -24,10 +24,7 @@ const CreatePreview = ({ nftFormData, pictures, eth }) => {
                 </div>
                 <div className='text-secondary pb-2'>
                     Owned by
-                    <span
-                        className="text-primary cursor-pointer"
-                        onClick={() => navigate(`/account/${eth.account._id}`)}
-                    >
+                    <span className="text-primary">
                         {<>
                             { } {(eth.account.status === ACCOUNT_STATE.VERIFIED) && <FontAwesomeIcon
                                 icon={faCircleCheck}
@@ -40,7 +37,7 @@ const CreatePreview = ({ nftFormData, pictures, eth }) => {
 
             <CreatePreviewPictures pictures={pictures} />
 
-            <div className='py-3'>
+            <div className='py-3 user-select-none'>
                 <div className='rounded-3 h-100 w-100' style={{ whiteSpace: 'pre-line' }}>
                     <Accordion defaultActiveKey={['Description']} alwaysOpen>
                         <Accordion.Item eventKey='Description'>

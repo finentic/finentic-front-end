@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import { useEth } from '../../contexts'
 
 function NavigationBar(props) {
-    const { eth } = useEth()
+    const eth = useEth()
     const navigate = useNavigate()
     const [expanded, setExpanded] = useState(false);
     return (

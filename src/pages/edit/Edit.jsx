@@ -9,7 +9,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 function Edit() {
   const { itemId } = useParams()
-  const { eth } = useEth()
+  const eth = useEth()
   const navigate = useNavigate()
   const [itemDetail, setItemDetail] = useState(false)
 

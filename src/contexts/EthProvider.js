@@ -12,6 +12,8 @@ import {
 } from '../utils'
 import { getAccount } from '../api'
 
+const ETHEREUM_EVENTS = ["chainChanged", "accountsChanged"]
+
 const EthContext = createContext()
 
 function EthProvider({ children }) {
@@ -25,6 +27,8 @@ function EthProvider({ children }) {
         if (window.ethereum) {
           provider = new ethers.providers.Web3Provider(window.ethereum)
           const accounts = await provider.send("eth_requestAccounts", [])
+          ETHEREUM_EVENTS.forEach(event => window.ethereum.on(event, init))
+
           signer = provider.getSigner()
           account = getAccount(accounts[0])
           network = await provider.detectNetwork()
@@ -88,34 +92,15 @@ function EthProvider({ children }) {
       })
     }, [])
 
-  // useEffect(() => {
-  //   const isConnected = localStorage.getItem('isConnected')
-  //   setIsConnected(isConnected ? false : true)
-  // }, [init])
-
   useEffect(() => {
-    const tryInit = async () => {
-      try {
-        init()
-      } catch (err) {
-        console.error(err)
-      }
+    try {
+      init()
+    } catch (err) {
+      console.error(err)
     }
-    tryInit()
   }, [init])
 
-  useEffect(() => {
-    if (window.ethereum) {
-      const events = ["chainChanged", "accountsChanged"]
-      const handleChange = () => init()
-      events.forEach(e => window.ethereum.on(e, handleChange))
-      return () => {
-        events.forEach(e => window.ethereum.removeListener(e, handleChange))
-      }
-    }
-  }, [init, eth.provider, eth.account])
-
-  const ethContext = useMemo(() => ({ eth }), [eth])
+  const ethContext = useMemo(() => (eth), [eth])
 
   return (
     <EthContext.Provider value={ethContext}>

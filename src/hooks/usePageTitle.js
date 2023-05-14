@@ -12,7 +12,7 @@ const usePageTitle = (pageTitle) => {
     return () => {
       document.title = prevTitle
     }
-  })
+  }, [pageTitle])
 }
 
 export default usePageTitle

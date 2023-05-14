@@ -13,7 +13,7 @@ import CreatePreview from './CreatePreview'
 
 function Create({ pageTitle }) {
   usePageTitle(pageTitle)
-  const { eth } = useEth()
+  const eth = useEth()
 
   const [buttonState, setButtonState] = useState(BUTTON_STATE.ENABLE)
   const [properties, setProperties] = useState([])
