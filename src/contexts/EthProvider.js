@@ -60,9 +60,9 @@ function EthProvider({ children }) {
             }
           }
         } else {
-          provider = new ethers.providers.JsonRpcProvider(RPC_URI)
+          provider = new ethers.providers.WebSocketProvider(RPC_URI)
+          account = getAccount(ethers.constants.AddressZero)
         }
-
         const contractProvider = signer || provider
         ControlCenterContract = controlCenterContract(contractProvider)
         CollectionFactoryContract = collectionFactoryContract(contractProvider)
@@ -73,7 +73,7 @@ function EthProvider({ children }) {
         console.error(err)
       }
 
-      account = (await account).data
+      account = (await account)?.data
 
       setEth({
         provider,
