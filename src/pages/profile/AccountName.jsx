@@ -1,15 +1,19 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { updateName } from '../../api'
-import { Form } from 'react-bootstrap'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCircleCheck } from '@fortawesome/free-solid-svg-icons'
 import { ACCOUNT_STATE } from '../../utils'
 
 
-function Name({ accountDetail }) {
+function AccountName({ accountDetail, isOwner }) {
     const [editNameElement, setEditNameElement] = useState(false)
-    const [accountName, setAccountName] = useState(accountDetail.name)
-    const [newName, setNewName] = useState(accountDetail.name)
+    const [accountName, setAccountName] = useState('')
+    const [newName, setNewName] = useState('')
+
+    useEffect(() => {
+        setAccountName(accountDetail.name)
+        setNewName(accountDetail.name)
+    }, [accountDetail.name])
 
     const handleNameSubmit = async event => {
         try {
@@ -19,7 +23,7 @@ function Name({ accountDetail }) {
                 name: newName,
             })
             setAccountName(newName)
-            this.hideEditNameElement()
+            hideEditNameElement()
         } catch (error) {
             console.error(error)
         }
@@ -30,7 +34,7 @@ function Name({ accountDetail }) {
     }
 
     const showEditNameElement = () => {
-        setEditNameElement(true)
+        isOwner && setEditNameElement(true)
     }
 
     const hideEditNameElement = () => {
@@ -42,7 +46,7 @@ function Name({ accountDetail }) {
             <label
                 className={editNameElement ? 'd-none' : 'd-block'}
                 htmlFor="accountName">
-                <h2 className='fw-bold text-third'>
+                <h2 className='h2 fw-bold text-third cursor-text'>
                     {accountName} {(accountDetail.status === ACCOUNT_STATE.VERIFIED) && <FontAwesomeIcon
                         icon={faCircleCheck}
                         className='text-primary fs-3'
@@ -51,13 +55,12 @@ function Name({ accountDetail }) {
             </label>
             {editNameElement ? (
                 <form className={editNameElement ? 'd-block' : 'd-none'} onSubmit={handleNameSubmit}>
-                    <Form.Control
+                    <input
                         type='text'
-                        size='lg'
                         name='accountName'
                         id='accountName'
                         maxLength='32'
-                        className='py-0'
+                        className='input-transparent p-0 h2 fw-bold text-third'
                         onBlur={hideEditNameElement}
                         onChange={handleNameChange}
                         value={newName}
@@ -69,4 +72,4 @@ function Name({ accountDetail }) {
     )
 }
 
-export default Name
+export default AccountName

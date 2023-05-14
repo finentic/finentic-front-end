@@ -1,79 +1,79 @@
 import { usePageTitle } from '../../hooks'
-import React, { useEffect, useState } from 'react'
-import Avatar from './Avatar'
-import Name from './Name'
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react'
+import AccountBasicInfo from './AccountBasicInfo'
 import { Tab, Tabs } from 'react-bootstrap'
-import { formatHexString, toAddressUrl, toImgUrl } from '../../utils'
-import { TooltipCopy } from '../../components'
 import { useParams } from 'react-router-dom'
 import { getAccount } from '../../api'
+import { useEth } from '../../contexts'
 
 
-function Profile({ pageTitle }) {
-  usePageTitle(pageTitle)
+function Profile() {
   const { accountId } = useParams()
-  const [accountDetail, setAccountDetail] = useState(false)
+  const [accountDetail, setAccountDetail] = useState()
+
+  const getAccountData = useCallback(async (_accountId) => {
+    try {
+      const accountResponse = await getAccount(_accountId)
+      setAccountDetail(accountResponse.data)
+    } catch (error) {
+      console.error(error)
+    }
+  }, [])
 
   useEffect(() => {
-    const getItemList = async () => {
-      try {
-        const accountResponse = await getAccount(accountId)
-        console.log(accountResponse)
-        setAccountDetail(accountResponse.data)
-      } catch (error) { }
+    if (accountId) {
+      console.log(accountId)
+      getAccountData(accountId)
     }
-    getItemList()
-    return () => setAccountDetail()
-  }, [accountId])
+  }, [accountId, getAccountData])
 
-  if (!accountDetail) return null
-  return (<ProfileBody
-    accountDetail={accountDetail}
-    key={accountDetail._id}
+  const accountMemo = useMemo(() => ({ accountDetail }), [accountDetail])
+
+  if (!accountMemo.accountDetail) return null
+  return (<ProfileBodyMemo
+    accountDetail={accountMemo.accountDetail}
+    key={accountId}
   />)
 }
 
+const ProfileBodyMemo = memo(ProfileBody, (prevProps, nextProps) => prevProps.accountDetail._id === nextProps.accountDetail._id)
+
 function ProfileBody({ accountDetail }) {
   usePageTitle(accountDetail.name)
+  const eth = useEth()
+  const isOwner = (accountDetail._id.toLowerCase() === eth.account?._id.toLowerCase())
 
   return (
-    <div className='container py-4'>
-      <div className='row py-4'>
-        <div className='col' style={{ maxWidth: 100 }}>
-          <Avatar srcThumbnail={toImgUrl(accountDetail.thumbnail)} _id={accountDetail._id} />
-        </div>
-        <div className='col ps-4 pt-2'>
-          <Name accountDetail={accountDetail} />
-          <TooltipCopy
-            title={accountDetail.name}
-            contentCopy={accountDetail._id}
-            contentLink={toAddressUrl(accountDetail._id)}
-            className={'fs-5'}
+    <>
+      <AccountBasicInfo account={accountDetail} isOwner={isOwner} />
+
+      <div className='container py-3'>
+        <div className='pt-4'>
+          <Tabs
+            defaultActiveKey="items"
+            transition={true}
+            className="mb-3"
           >
-            {formatHexString(accountDetail._id, 5, 5)}
-          </TooltipCopy>
-
+            <Tab eventKey="items" title="Items">
+              {/* <MyItem accountId={accountDetail._id} /> */}
+            </Tab>
+            <Tab eventKey="sales" title="Sales order">
+              {/* <MyOrder accountId={this.props.account._id} web3={this.props.web3} order='sales' /> */}
+            </Tab>
+            <Tab eventKey="purchase" title="Purchase order">
+              {/* <MyOrder accountId={this.props.account._id} web3={this.props.web3} order='purchase' /> */}
+            </Tab>
+          </Tabs>
         </div>
-      </div>
-
-      <div className='pt-4'>
-        <Tabs
-          defaultActiveKey="items"
-          transition={true}
-          className="mb-3"
-        >
-          <Tab eventKey="items" title="Items">
-            {/* <MyItem accountId={accountDetail._id} /> */}
-          </Tab>
-          <Tab eventKey="sales" title="Sales order">
-            {/* <MyOrder accountId={this.props.account._id} web3={this.props.web3} order='sales' /> */}
-          </Tab>
-          <Tab eventKey="purchase" title="Purchase order">
-            {/* <MyOrder accountId={this.props.account._id} web3={this.props.web3} order='purchase' /> */}
-          </Tab>
-        </Tabs>
-      </div>
-    </div >
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+      </div >
+    </>
   )
 }
 
