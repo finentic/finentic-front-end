@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react"
-import { ButtonSubmit } from "../../components"
+import { ButtonSubmit, TimeCountdown } from "../../components"
 import {
     BUTTON_STATE,
     ITEM_STATE,
@@ -10,6 +10,7 @@ import {
     toTokenId,
     timestampToDate,
     toBN,
+    getBlockTimestamp,
 } from "../../utils"
 import { commify, parseUnits } from "ethers/lib/utils"
 import { faBriefcaseClock, faTag } from "@fortawesome/free-solid-svg-icons"
@@ -154,10 +155,19 @@ function Trading({ item, eth, isOwner }) {
     if (item.state === ITEM_STATE.LISTING) return (
         <div className="card rounded-3">
             <div className="card-header py-3">
-                <FontAwesomeIcon icon={item.start_time ? faBriefcaseClock : faTag} />
-                <span className='fw-bold ms-2'>
+                <div className='fw-bold float-start'>
+                    <FontAwesomeIcon icon={item.start_time ? faBriefcaseClock : faTag} className="me-2" />
                     {LISTING_TITLE[getListingState()]}
-                </span>
+                </div>
+                <div className='float-end'>
+                    {(getListingState() === LISTING_STATE.START_SOON) && (<>
+                        Start in: <TimeCountdown timeRemaining={Number(item.start_time) - getBlockTimestamp()} className='text-primary' />
+                    </>)}
+
+                    {(getListingState() === LISTING_STATE.ACTIVE) && (<>
+                        End in: <TimeCountdown timeRemaining={Number(item.end_time) - getBlockTimestamp()} className='text-danger' />
+                    </>)}
+                </div>
             </div>
             <div className="card-body">
                 <form onSubmit={(!item.start_time) ? handleBuyNow : handlePlaceBid}>
