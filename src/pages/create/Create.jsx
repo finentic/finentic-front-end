@@ -132,7 +132,7 @@ function Create({ pageTitle }) {
           <form onSubmit={handleSubmit}>
             <div className='form-group'>
               <label htmlFor='pictures' className='fw-bold'>
-                Picture <span className='text-danger'>*</span>
+                Pictures <span className='text-danger'>*</span>
               </label>
               <br />
               <small className='text-muted'>
