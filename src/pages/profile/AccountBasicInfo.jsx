@@ -9,18 +9,16 @@ import AccountBio from './AccountBio'
 
 
 function AccountBasicInfo({ account, isOwner }) {
-    console.log(isOwner)
     const [isEditingAvatar, setIsEditingAvatar] = useState(false)
     const [avatar, setAvatar] = useState(undefined)
 
     const handleUpdate = async (event) => {
         const picture = event.target.files[0]
         if (picture) {
-            const formData = new FormData()
-            formData.append('file', picture, picture.name)
-            formData.append('account_address', account._id)
             try {
-                console.log(Object.fromEntries(formData))
+                const formData = new FormData()
+                formData.append('account_address', account._id)
+                formData.append('file', picture)
                 const response = await updateAvatar(formData)
                 setAvatar(toImgUrl(response.data))
                 document.getElementById('picture').value = null
@@ -50,11 +48,11 @@ function AccountBasicInfo({ account, isOwner }) {
                 <div className='container py-4'>
                     <div className='row py-4'>
                         <div className='col col-12 col-md-6'>
-                            <div onMouseEnter={() => isOwner && setIsEditingAvatar(true)} style={{
+                            <form onMouseEnter={() => isOwner && setIsEditingAvatar(true)} style={{
                                 position: 'absolute',
                                 height: '100px',
                                 width: '100px',
-                            }}>
+                            }} onSubmit={(event) => event.preventDefault()}>
                                 <img
                                     src={avatar || toImgUrl(account.thumbnail)}
                                     className="rounded-3 h-100 w-100"
@@ -97,7 +95,7 @@ function AccountBasicInfo({ account, isOwner }) {
                                     disabled={!isOwner}
                                     accept='image/png, image/jpg, image/jpeg'
                                 />
-                            </div >
+                            </form >
 
                             <div className='ps-4 pt-2' style={{ marginLeft: 100 }}>
                                 <AccountName accountDetail={account} isOwner={isOwner} />
