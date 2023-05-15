@@ -39,6 +39,28 @@ function updateItem(formData) {
 }
 
 
+// ACCOUNT ITEMS
+
+function getAllItemsOfAccount(account_address) {
+  return axiosInstance.get('/items/account', { params: { account_address } })
+}
+
+function getAllItemsFixedPriceListingOfAccount(account_address) {
+  return axiosInstance.get('/items/account/fixed-price', { params: { account_address } })
+}
+
+function getAllItemsAuctionListingOfAccount(account_address) {
+  return axiosInstance.get('/items/account/auction', { params: { account_address } })
+}
+
+function getAllItemsCreatedOfAccount(account_address) {
+  return axiosInstance.get('/items/account/created', { params: { account_address } })
+}
+
+function getAllOrdersOfAccount(account_address) {
+  return axiosInstance.get('/items/account/orders/sales', { params: { account_address } })
+}
+
 export {
   exploreItem,
   getItemById,
@@ -46,5 +68,10 @@ export {
   getItemsSuggested,
   updateItem,
   createItem,
-  getItemForUpdate
+  getItemForUpdate,
+  getAllItemsOfAccount,
+  getAllItemsFixedPriceListingOfAccount,
+  getAllItemsAuctionListingOfAccount,
+  getAllItemsCreatedOfAccount,
+  getAllOrdersOfAccount,
 }
