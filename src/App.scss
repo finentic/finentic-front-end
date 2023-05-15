@@ -21,7 +21,7 @@ $theme-colors: (
 );
 
 // mouse and point
-.cursor-no-click {
+.cursor-none {
   pointer-events: none;
 }
 
@@ -31,6 +31,10 @@ $theme-colors: (
 
 .cursor-text:hover {
   cursor: text;
+}
+
+.text-line {
+  white-space: pre-line;
 }
 
 .shadow-hover {
