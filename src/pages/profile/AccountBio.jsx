@@ -6,19 +6,6 @@ function AccountBio({ account, isOwner }) {
     const [accountBio, setAccountBio] = useState(account.bio || '')
     const [newBio, setNewBio] = useState(account.bio || '')
 
-    const handleBioSubmit = async () => {
-        try {
-            await updateBio({
-                account_address: account._id,
-                bio: newBio,
-            })
-            setAccountBio(newBio)
-            hideEditBioElement()
-        } catch (error) {
-            console.error(error)
-        }
-    }
-
     const handleBioChange = event => {
         setNewBio(event.target.value)
     }
@@ -27,14 +14,23 @@ function AccountBio({ account, isOwner }) {
         isOwner && setEditBioElement(true)
     }
 
-    const hideEditBioElement = () => {
-        setEditBioElement(false)
+    const hideEditBioElement = async () => {
+        try {
+            await updateBio({
+                account_address: account._id,
+                bio: newBio,
+            })
+            setAccountBio(newBio)
+            setEditBioElement(false)
+        } catch (error) {
+            console.error(error)
+        }
     }
 
     return (
         <label
             onClick={showEditBioElement}
-            className={`d-none d-md-block col col-md-6 ps-4 pt-2 text-center ${isOwner && 'cooltipz--left cursor-text'}`}
+            className={`d-none d-md-block col col-md-6 ps-4 pt-2 text-center text-line fst-italic ${isOwner && 'cooltipz--top cursor-text'}`}
             aria-label='Click to edit your bio'
             htmlFor="accountBio"
         >
@@ -53,7 +49,6 @@ function AccountBio({ account, isOwner }) {
                         onChange={handleBioChange}
                         value={newBio}
                         style={{ height: 78, wordBreak: 'break-word', resize: 'none' }}
-                        onKeyDown={(event) => (event.key === 'Enter') && handleBioSubmit()}
                     />
                 </form>
             ) : null}
