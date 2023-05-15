@@ -10,12 +10,14 @@ import {
   TokenSale,
   Edit,
   Profile,
+  CreateCollection,
 } from "../pages"
 import { NavigationBar } from "../components"
 
 const ROUTERS_PATH = {
   home: 'home/',
   create: 'create/',
+  createCollection: 'create/collection/',
   item: 'item/',
   account: 'account/',
   error500: 'error-500/',
@@ -32,12 +34,13 @@ const MainRoutes = () => {
           <Route path="/">
             <Route index element={<Home pageTitle="Home" />} />
             <Route path={ROUTERS_PATH.home} element={<Navigate to="/" replace />} />
-            <Route path="tokenSale" element={<TokenSale pageTitle="Buy FxETH" />} />
             <Route path={ROUTERS_PATH.create} element={<Create pageTitle="Create NFT" />} />
+            <Route path={ROUTERS_PATH.createCollection} element={<CreateCollection pageTitle="Create Collection" />} />
             <Route path={`${ROUTERS_PATH.item}:itemId`} element={<ItemDetail pageTitle="Detail" />} />
             <Route path={`${ROUTERS_PATH.item}:itemId/listing`} element={<Listing pageTitle="List for sale" />} />
             <Route path={`${ROUTERS_PATH.item}:itemId/edit`} element={<Edit pageTitle="Edit item" />} />
             <Route path={`${ROUTERS_PATH.account}:accountId`} element={<Profile pageTitle="Account profile" />} />
+            <Route path="tokenSale" element={<TokenSale pageTitle="Buy FxETH" />} />
 
             {/* for error routes */}
             <Route path="*" element={<Error404 pageTitle="Not found" />} />
