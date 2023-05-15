@@ -100,7 +100,6 @@ function AccountBasicInfo({ account, isOwner }) {
                             <div className='ps-4 pt-2' style={{ marginLeft: 100 }}>
                                 <AccountName accountDetail={account} isOwner={isOwner} />
                                 <TooltipCopy
-                                    title={account.name}
                                     contentCopy={account._id}
                                     contentLink={toAddressUrl(account._id)}
                                     className={'fs-5'}
