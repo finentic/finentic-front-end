@@ -16,6 +16,7 @@ import { commify, parseUnits } from "ethers/lib/utils"
 import { faBriefcaseClock, faTag } from "@fortawesome/free-solid-svg-icons"
 import { Dropdown, DropdownButton, Form, InputGroup } from "react-bootstrap"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { useEth } from "../../contexts"
 
 
 const BUTTON_TITLE = {
@@ -33,8 +34,9 @@ const LISTING_TITLE = {
 }
 
 
-function Trading({ item, eth, isOwner }) {
+function Trading({ item, isOwner }) {
     const ref = useRef(null)
+    const eth = useEth()
     const [buttonState, setButtonState] = useState(BUTTON_STATE.ENABLE)
     const [cursor, setCursor] = useState(0)
     const [auctionForm, setAuctionForm] = useState({
@@ -57,7 +59,7 @@ function Trading({ item, eth, isOwner }) {
         if (now > endTime) return LISTING_STATE.ENDED
     }
 
-    const isWinner = getListingState() === LISTING_STATE.ENDED && item.price_history[0].account._id === eth.account._id.toLowerCase()
+    const isWinner = getListingState() === LISTING_STATE.ENDED && item.price_history[0]?.account._id === eth.account?._id.toLowerCase()
 
     const resetState = () => setButtonState(BUTTON_STATE.ENABLE)
 

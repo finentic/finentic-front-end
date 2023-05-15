@@ -232,7 +232,7 @@ function Detail({ item }) {
             ownership_history={item.ownership_history}
           />
 
-          <Trading item={item} isOwner={isOwner} eth={eth} />
+          <Trading item={item} isOwner={isOwner}/>
 
           <CardInfo icon={faReceipt} title='Price History' defaultActive>
             <PriceHistory
