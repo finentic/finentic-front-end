@@ -1,9 +1,20 @@
 import { useState } from 'react'
 import { Nav, Navbar, NavDropdown, Container } from 'react-bootstrap'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPen, faSearch, faWallet, faUser, faGear, faRightFromBracket, faPlug } from '@fortawesome/free-solid-svg-icons'
+import {
+    faSearch,
+    faWallet,
+    faUser,
+    faGear,
+    faRightFromBracket,
+    faPlug,
+    faFolderPlus,
+    faFilePen
+} from '@fortawesome/free-solid-svg-icons'
 import { useNavigate } from 'react-router-dom'
 import { useEth } from '../../contexts'
+import { ROUTERS_PATH } from '../../routers/MainRoutes'
+import { constants } from 'ethers'
 
 function NavigationBar(props) {
     const eth = useEth()
@@ -47,7 +58,7 @@ function NavigationBar(props) {
                     <Nav className="col"></Nav>
 
                     <Nav>
-                        {(eth.account && eth.account._id !== '0x0000000000000000000000000000000000000000')
+                        {(eth.account && eth.account._id !== constants.AddressZero)
                             ? <NavDropdown
                                 className='rounded-2 fw-bold'
                                 title={<><FontAwesomeIcon icon={faWallet} className='pe-2' /> {eth.account.name}</>}
@@ -55,39 +66,69 @@ function NavigationBar(props) {
                             >
                                 <NavDropdown.Item onClick={() => {
                                     setExpanded(false)
-                                    navigate('/create')
+                                    navigate(ROUTERS_PATH.create)
                                 }}>
-                                    <FontAwesomeIcon icon={faPen} className='text-third pe-2' /> Create
+                                    <FontAwesomeIcon
+                                        icon={faFilePen}
+                                        className='text-third pe-2'
+                                        style={{ width: 20 }}
+                                    /> Create Item
                                 </NavDropdown.Item>
 
                                 <NavDropdown.Item onClick={() => {
                                     setExpanded(false)
-                                    navigate('/account/' + eth.account._id)
+                                    navigate(ROUTERS_PATH.createCollection)
                                 }}>
-                                    <FontAwesomeIcon icon={faUser} className='text-third pe-2' /> Profile
+                                    <FontAwesomeIcon
+                                        icon={faFolderPlus}
+                                        className='text-third pe-2'
+                                        style={{ width: 20 }}
+                                    /> Create Collection
+                                </NavDropdown.Item>
+
+                                <NavDropdown.Item onClick={() => {
+                                    setExpanded(false)
+                                    navigate(ROUTERS_PATH.account + eth.account._id)
+                                }}>
+                                    <FontAwesomeIcon
+                                        icon={faUser}
+                                        className='text-third pe-2'
+                                        style={{ width: 20 }}
+                                    />  Your Profile
                                 </NavDropdown.Item>
 
                                 <NavDropdown.Item onClick={() => {
                                     setExpanded(false)
                                     navigate('/setting')
                                 }}>
-                                    <FontAwesomeIcon icon={faGear} className='text-third pe-2' /> Setting
+                                    <FontAwesomeIcon
+                                        icon={faGear}
+                                        className='text-third pe-2'
+                                        style={{ width: 20 }}
+                                    /> Setting
                                 </NavDropdown.Item>
 
                                 <NavDropdown.Divider />
 
                                 <NavDropdown.Item onClick={() => {
                                     setExpanded(false)
-                                    props.logout()
                                 }}>
-                                    <FontAwesomeIcon icon={faRightFromBracket} className='text-third pe-2' /> Disconnect
+                                    <FontAwesomeIcon
+                                        icon={faRightFromBracket}
+                                        className='text-third pe-2'
+                                        style={{ width: 20 }}
+                                    /> Disconnect
                                 </NavDropdown.Item>
                             </NavDropdown>
-                            : <Nav.Link className='fw-bold me-4' onClick={() => {
+                            : <Nav.Link className='fw-bold' onClick={() => {
                                 setExpanded(false)
                                 navigate('/account/' + eth.account._id)
                             }}>
-                                <FontAwesomeIcon icon={faPlug} className='text-third pe-2' /> Connect
+                                <FontAwesomeIcon
+                                    icon={faPlug}
+                                    className='text-third pe-2'
+                                    style={{ width: 20 }}
+                                /> Connect
                             </Nav.Link>
                         }
                     </Nav>
