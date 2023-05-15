@@ -61,6 +61,13 @@ function getAllOrdersOfAccount(account_address) {
   return axiosInstance.get('/items/account/orders/sales', { params: { account_address } })
 }
 
+// COLLECTION
+
+function getAllItemOfCollection(collection_address) {
+  return axiosInstance.get('/items/collection', { params: { collection_address } })
+}
+
+
 export {
   exploreItem,
   getItemById,
@@ -74,4 +81,5 @@ export {
   getAllItemsAuctionListingOfAccount,
   getAllItemsCreatedOfAccount,
   getAllOrdersOfAccount,
+  getAllItemOfCollection,
 }
