@@ -1,4 +1,4 @@
 export * from "./axiosInstance";
-export * from "./categoriesApi";
-export * from "./itemApi";
-export * from "./accountApi";
+export * from "./collections";
+export * from "./items";
+export * from "./accounts";
