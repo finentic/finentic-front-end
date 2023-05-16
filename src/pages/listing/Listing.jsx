@@ -2,7 +2,7 @@ import { createRef, useEffect, useState } from 'react'
 import { usePageTitle } from '../../hooks'
 import { ButtonSubmit } from '../../components'
 import { useEth } from '../../contexts'
-import { BUTTON_STATE, ITEM_STATE, MARKETPLACE_ADDRESS, SHARED_ADDRESS, VIETNAMESE_DONG_ADDRESS, toTokenId } from '../../utils'
+import { BUTTON_STATE, ITEM_STATE, MARKETPLACE_ADDRESS, SHARED_ADDRESS, VIETNAMESE_DONG_ADDRESS, collectionContract, toTokenAddress, toTokenId } from '../../utils'
 import { getItemById } from '../../api'
 import { useNavigate, useParams } from 'react-router-dom'
 import { commify, parseEther } from 'ethers/lib/utils'
@@ -37,7 +37,7 @@ function Listing({ pageTitle }) {
     getItemList()
     return () => setItemDetail(false)
   }, [eth.MarketplaceContract, itemId])
-  
+
   if (!itemDetail) return null
   const isOwner = (itemDetail.owner._id.toLowerCase() === eth.account._id.toLowerCase())
   if (!isOwner || itemDetail.state !== ITEM_STATE.CREATED) navigate(`/item/${itemDetail._id}`)
@@ -99,20 +99,21 @@ function ListForSale({ item, serviceFeePercent }) {
     const startTime = new Date(listingForm.startTime).getTime() / 1000
     const endTime = new Date(listingForm.endTime).getTime() / 1000
     try {
-      const getApproved = await eth.SharedContract.getApproved(toTokenId(item._id))
-      const isApprovedForAll = await eth.SharedContract.isApprovedForAll(eth.account._id, MARKETPLACE_ADDRESS)
+      const CollectionContract = collectionContract(eth.signer, toTokenAddress(item._id))
+      const getApproved = await CollectionContract.getApproved(toTokenId(item._id))
+      const isApprovedForAll = await CollectionContract.isApprovedForAll(eth.account._id, MARKETPLACE_ADDRESS)
       if (!(getApproved.toLowerCase() === MARKETPLACE_ADDRESS.toLowerCase() || isApprovedForAll)) {
-        await eth.SharedContract.approve(MARKETPLACE_ADDRESS, toTokenId(item._id))
-        eth.SharedContract.on('Approval', async (owner) => (owner.toLowerCase() === eth.account._id) && setButtonState(BUTTON_STATE.DONE))
+        await CollectionContract.approve(MARKETPLACE_ADDRESS, toTokenId(item._id))
+        CollectionContract.on('Approval', async (owner) => (owner.toLowerCase() === eth.account._id) && setButtonState(BUTTON_STATE.DONE))
       } else {
         if (listingForm.method === 'fixed') {
           eth.MarketplaceContract.on('ListForBuyNow',
             (nftContract, tokenId) => (
-              nftContract === SHARED_ADDRESS && tokenId.toString() === toTokenId(item._id)
+              nftContract.toLowerCase() === CollectionContract.address.toLowerCase() && tokenId.toString() === toTokenId(item._id)
             ) && navigate(`/item/${item._id}`)
           )
           await eth.MarketplaceContract.listForBuyNow(
-            SHARED_ADDRESS,
+            CollectionContract.address.toLowerCase(),
             toTokenId(item._id),
             item.is_phygital,
             VIETNAMESE_DONG_ADDRESS,
@@ -120,7 +121,7 @@ function ListForSale({ item, serviceFeePercent }) {
           )
         } else {
           await eth.MarketplaceContract.listForAuction(
-            SHARED_ADDRESS,
+            CollectionContract.address.toLowerCase(),
             toTokenId(item._id),
             item.is_phygital,
             startTime,
@@ -131,7 +132,7 @@ function ListForSale({ item, serviceFeePercent }) {
           )
           eth.MarketplaceContract.on('ListForAuction',
             (nftContract, tokenId) => (
-              nftContract === SHARED_ADDRESS && tokenId.toString() === toTokenId(item._id)
+              nftContract.toLowerCase() === CollectionContract.address.toLowerCase() && tokenId.toString() === toTokenId(item._id)
             ) && navigate(`/item/${item._id}`)
           )
         }

@@ -5,12 +5,12 @@ import {
     ITEM_STATE,
     LISTING_STATE,
     MARKETPLACE_ADDRESS,
-    SHARED_ADDRESS,
     formatPrice,
     toTokenId,
     timestampToDate,
     toBN,
     getBlockTimestamp,
+    toTokenAddress,
 } from "../../utils"
 import { commify, parseUnits } from "ethers/lib/utils"
 import { faBriefcaseClock, faTag } from "@fortawesome/free-solid-svg-icons"
@@ -42,6 +42,7 @@ function Trading({ item, isOwner }) {
     const [auctionForm, setAuctionForm] = useState({
         price: formatPrice(item.price || '0'),
     })
+    const [newPrice, setNewPrice] = useState()
 
     useEffect(() => {
         const input = ref.current
@@ -61,7 +62,14 @@ function Trading({ item, isOwner }) {
 
     const isWinner = getListingState() === LISTING_STATE.ENDED && item.price_history[0]?.account._id === eth.account?._id.toLowerCase()
 
-    const resetState = () => setButtonState(BUTTON_STATE.ENABLE)
+    const resetState = () => {
+        setButtonState(BUTTON_STATE.ENABLE)
+    }
+
+    const resetStateAndSetNewPrice = () => {
+        setNewPrice(auctionForm.price)
+        setButtonState(BUTTON_STATE.ENABLE)
+    }
 
     const handleInputChange = event => {
         const target = event.target
@@ -86,34 +94,42 @@ function Trading({ item, isOwner }) {
         try {
             if (isWinner) {
                 await eth.MarketplaceContract.paymentProcessingItemAuction(
-                    SHARED_ADDRESS,
+                    toTokenAddress(item._id),
                     toTokenId(item._id),
                 )
                 eth.MarketplaceContract.on(
                     'Invoice',
                     async (_buyer, _seller, nftContract, tokenId) => (
-                        nftContract.toLowerCase() === SHARED_ADDRESS.toLowerCase() &&
-                        tokenId.toString() === toTokenId(item._id)
-                    ) && resetState()
+                        nftContract.toLowerCase() === toTokenAddress(item._id).toLowerCase() &&
+                        tokenId.toString() === toTokenId(item._id) &&
+                        resetStateAndSetNewPrice()
+                    )
                 )
             } else {
                 const bid = parseUnits(auctionForm.price.replaceAll(',', ''), '18')
                 const isEnoughAllowance = await eth.VietnameseDong.allowance(eth.account._id, MARKETPLACE_ADDRESS)
                 if (isEnoughAllowance.lt(bid)) {
                     await eth.VietnameseDong.approve(MARKETPLACE_ADDRESS, bid)
-                    eth.VietnameseDong.on('Approval', async (owner) => (owner.toLowerCase() === eth.account._id) && setButtonState(BUTTON_STATE.DONE))
+                    eth.VietnameseDong.on(
+                        'Approval',
+                        async (owner) => (
+                            owner.toLowerCase() === eth.account._id &&
+                            setButtonState(BUTTON_STATE.DONE)
+                        )
+                    )
                 }
                 await eth.MarketplaceContract.biddingForAuction(
-                    SHARED_ADDRESS,
+                    toTokenAddress(item._id),
                     toTokenId(item._id),
                     bid,
                 )
                 eth.MarketplaceContract.on(
                     'BiddingForAuction',
                     async (nftContract, tokenId) => (
-                        nftContract.toLowerCase() === SHARED_ADDRESS.toLowerCase() &&
-                        tokenId.toString() === toTokenId(item._id)
-                    ) && resetState()
+                        nftContract.toLowerCase() === toTokenAddress(item._id).toLowerCase() &&
+                        tokenId.toString() === toTokenId(item._id) &&
+                        resetStateAndSetNewPrice()
+                    )
                 )
             }
         } catch (error) {
@@ -137,15 +153,16 @@ function Trading({ item, isOwner }) {
                 )
             } else {
                 await eth.MarketplaceContract.buyNow(
-                    SHARED_ADDRESS,
+                    toTokenAddress(item._id),
                     toTokenId(item._id),
                 )
                 eth.MarketplaceContract.on(
                     'RemoveItemForBuyNow',
                     async (nftContract, tokenId) => (
-                        nftContract.toLowerCase() === SHARED_ADDRESS.toLowerCase() &&
-                        tokenId.toString() === toTokenId(item._id)
-                    ) && resetState()
+                        nftContract.toLowerCase() === toTokenAddress(item._id).toLowerCase() &&
+                        tokenId.toString() === toTokenId(item._id) &&
+                        resetState()
+                    )
                 )
             }
         } catch (error) {
@@ -177,7 +194,7 @@ function Trading({ item, isOwner }) {
                         <p>
                             {item.start_time ? 'Top bid' : 'Price'}: <br />
                             <span className='fs-4 fw-bold'>
-                                {(formatPrice(item.price) + ' VND')}
+                                {newPrice || (formatPrice(item.price))} VND
                             </span>
                         </p>
                     </div>
@@ -200,7 +217,7 @@ function Trading({ item, isOwner }) {
                                         type='text'
                                         value={auctionForm.price}
                                         onChange={handleInputChange}
-                                        disabled={isOwner}
+                                        disabled={isOwner || buttonState === BUTTON_STATE.PENDING}
                                         readOnly={isOwner}
                                         ref={ref}
                                     />
@@ -221,7 +238,7 @@ function Trading({ item, isOwner }) {
                                 getListingState() === LISTING_STATE.BUY_NOW || isWinner || (
                                     getListingState() === LISTING_STATE.ACTIVE && (
                                         toBN(
-                                            formatPrice(item.price).replaceAll(',', '')
+                                            newPrice?.replaceAll(',', '') || formatPrice(item.price).replaceAll(',', '')
                                         ).lt(
                                             toBN(auctionForm.price.replaceAll(',', ''))
                                         )
