@@ -51,7 +51,7 @@ function Create({ pageTitle }) {
     if (eth.account._id !== constants.AddressZero) getCollectionData()
   }, [eth.account._id])
 
-  const handleCollectionSellected = (event) => {
+  const handleCollectionSelected = (event) => {
     setCollectionSelected(collections[event.target.value])
   }
 
@@ -171,7 +171,7 @@ function Create({ pageTitle }) {
               <small className='text-muted'>
                 This is the collection where your item will appear.
               </small>
-              <select className='form-select' onChange={handleCollectionSellected}>
+              <select className='form-select' onChange={handleCollectionSelected}>
                 {collections.length && collections.map((collection, index) => (
                   <option
                     value={index}
