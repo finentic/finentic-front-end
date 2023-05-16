@@ -1,10 +1,17 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { toImgUrl, formatPrice, ITEM_STATE, ACCOUNT_STATE } from '../../utils'
+import { toImgUrl, formatPrice, ITEM_STATE, ACCOUNT_STATE, getBlockTimestamp } from '../../utils'
 import { ButtonImg } from '../button-img'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCircleCheck } from '@fortawesome/free-solid-svg-icons'
+import { TimeCountdown } from '../time-countdown'
 
+const LISTING_STATE = {
+    'BUY_NOW': 'BUY_NOW',
+    'START_SOON': 'START_SOON',
+    'ACTIVE': 'ACTIVE',
+    'ENDED': 'ENDED',
+}
 
 function ItemCard({ item }) {
     const navigate = useNavigate()
@@ -15,9 +22,23 @@ function ItemCard({ item }) {
     const handleOnMouseLeave = () => {
         setShow(0)
     }
-    const handleOnClick = (event) => {
+    const handleOnClick = () => {
         navigate(`/item/${item._id}`)
     }
+
+    const now = new Date().getTime()
+    const startTime = Number(item.start_time + '000')
+    const endTime = Number(item.end_time + '000')
+
+    const getListingState = () => {
+        if (!item.start_time) return LISTING_STATE.BUY_NOW
+        if (now < startTime) return LISTING_STATE.START_SOON
+        if (now > startTime && now < endTime) return LISTING_STATE.ACTIVE
+        if (now > endTime) return LISTING_STATE.ENDED
+    }
+
+    const listingState = getListingState()
+
     return (
         <div className='col-12 col-sm-6 col-lg-4 col-xl-3 mb-4'        >
             <div className='card rounded-3 shadow-sm shadow-hover cursor-pointer' onClick={handleOnClick}>
@@ -100,15 +121,39 @@ function ItemCard({ item }) {
                             navigate(`/account/${item.owner._id}`)
                         }}
                     />
-                    <p className="card-text fs-5 pt-2">
-                        {(item.state === ITEM_STATE.LISTING)
-                            ? (formatPrice(item.price) + ' VND')
-                            : <span className='text-secondary fs-6'>Not listing yet</span>
-                        }
+                    {(item.state !== ITEM_STATE.LISTING) && <p className='card-text fs-6 pt-2'>
+                        <span className='text-secondary'>
+                            Available
+                        </span>
+                        <br />
+                        Not for sale
+                    </p>}
+
+                    {(item.state === ITEM_STATE.LISTING) && <p className="card-text fs-6 pt-2">
+                        <span className='text-secondary'>
+                            {(listingState === LISTING_STATE.START_SOON) && (<>
+                                Start in: <TimeCountdown timeRemaining={Number(item.start_time) - getBlockTimestamp()} className='text-primary' />
+                            </>)}
+
+                            {(listingState === LISTING_STATE.ACTIVE) && (<>
+                                End in: <TimeCountdown timeRemaining={Number(item.end_time) - getBlockTimestamp()} className='text-danger' />
+                            </>)}
+
+                            {(listingState === LISTING_STATE.ENDED) && (<>
+                                Auction ended
+                            </>)}
+
+                            {(listingState === LISTING_STATE.BUY_NOW) && (<>
+                                Buy now
+                            </>)}
+                        </span>
+                        <br />
+                        {formatPrice(item.price) + ' VND'}
                     </p>
+                    }
                 </div>
             </div>
-        </div>
+        </div >
     )
 }
 
