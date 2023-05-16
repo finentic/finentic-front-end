@@ -1,12 +1,12 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { usePageTitle } from '../../hooks'
 import { ButtonSubmit } from '../../components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faExclamationTriangle, faPlus, faXmark } from '@fortawesome/free-solid-svg-icons'
 import { useEth } from '../../contexts'
 import { constants } from 'ethers'
-import { BUTTON_STATE, MARKETPLACE_ADDRESS } from '../../utils'
-import { createItem } from '../../api'
+import { BUTTON_STATE, MARKETPLACE_ADDRESS, SHARED_ADDRESS, collectionContract, toImgUrl } from '../../utils'
+import { createItem, getAllCollectionOfAccount, getCollection } from '../../api'
 import { Table } from 'react-bootstrap'
 import CreatePreview from './CreatePreview'
 
@@ -18,6 +18,11 @@ function Create({ pageTitle }) {
   const [buttonState, setButtonState] = useState(BUTTON_STATE.ENABLE)
   const [properties, setProperties] = useState([])
   const [pictures, setPictures] = useState([])
+  const [collections, setCollections] = useState([])
+  const [collectionSelected, setCollectionSelected] = useState({
+    _id: SHARED_ADDRESS,
+    name: 'Finentic Shared NFT'
+  })
   const [nftFormData, setNftFormData] = useState({
     name: '',
     is_phygital: false,
@@ -25,6 +30,30 @@ function Create({ pageTitle }) {
     description: '',
     external_url: '',
   })
+
+  useEffect(() => {
+    const getCollectionData = async () => {
+      try {
+        const collectionOfSharedRes = getCollection(SHARED_ADDRESS)
+        const collectionOfAccountRes = getAllCollectionOfAccount(eth.account._id)
+        const collectionOfAccount = (await collectionOfAccountRes).data
+        const collectionOfSharedData = (await collectionOfSharedRes).data
+
+        setCollections([
+          collectionOfSharedData,
+          ...collectionOfAccount.filter(collection => collection._id !== collectionOfSharedData._id),
+        ])
+      } catch (error) {
+        console.error(error)
+      }
+
+    }
+    if (eth.account._id !== constants.AddressZero) getCollectionData()
+  }, [eth.account._id])
+
+  const handleCollectionSellected = (event) => {
+    setCollectionSelected(collections[event.target.value])
+  }
 
   const handleInputChange = event => {
     const target = event.target
@@ -89,13 +118,14 @@ function Create({ pageTitle }) {
   const handleSubmit = async (event) => {
     event.preventDefault()
     setButtonState(BUTTON_STATE.PENDING)
-    const { currentTarget } = event;
-    const currentTokenId = await eth.SharedContract.currentTokenId()
+    const { currentTarget } = event
+    const CollectionContract = collectionContract(eth.signer, collectionSelected._id)
+    const currentTokenId = await CollectionContract.currentTokenId()
     const formData = new FormData()
     formData.append('token_id', currentTokenId.toString())
     formData.append('owner_address', eth.account._id.toLowerCase())
     formData.append('name', nftFormData.name)
-    formData.append('from_collection_address', eth.SharedContract.address)
+    formData.append('from_collection_address', CollectionContract.address)
     formData.append('description', nftFormData.description)
     formData.append('external_url', nftFormData.external_url)
     formData.append('is_phygital', !!nftFormData.is_phygital)
@@ -111,7 +141,7 @@ function Create({ pageTitle }) {
     try {
       const response = await createItem(formData)
       console.log(response.data.hashed_metadata)
-      await eth.SharedContract.mintAndApprove(
+      await CollectionContract.mintAndApprove(
         eth.account._id,
         MARKETPLACE_ADDRESS,
         response.data.hashed_metadata,
@@ -125,11 +155,30 @@ function Create({ pageTitle }) {
 
   return (
     <div className='container py-4'>
-      <h1 className='fw-bold h1'>Create a shared NFT</h1>
+      <h1 className='fw-bold h1'>Create an NFT</h1>
       <hr className='hr' />
       <div className='row'>
         <div className='col col-12 col-md-6'>
           <form onSubmit={handleSubmit}>
+            <div className='form-group my-3'>
+              <label className='fw-bold' htmlFor="collection">
+                Collection <span className='text-danger'>*</span>
+              </label>
+              <br />
+              <small className='text-muted'>
+                This is the collection where your item will appear.
+              </small>
+              <select className='form-select' onChange={handleCollectionSellected}>
+                {collections.length && collections.map((collection, index) => (
+                  <option
+                    value={index}
+                    key={collection._id}
+                  >
+                    {collection.name} {'(' + collection.symbol + ')'}
+                  </option>))
+                }
+              </select>
+            </div>
             <div className='form-group'>
               <label htmlFor='pictures' className='fw-bold'>
                 Pictures <span className='text-danger'>*</span>
@@ -297,7 +346,7 @@ function Create({ pageTitle }) {
         </div>
 
         <div className='col col-12 col-md-6'>
-          <CreatePreview nftFormData={nftFormData} eth={eth} pictures={pictures} />
+          <CreatePreview nftFormData={nftFormData} eth={eth} pictures={pictures} collectionSelected={collectionSelected} />
         </div>
       </div>
     </div >

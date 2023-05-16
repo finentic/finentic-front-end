@@ -63,7 +63,7 @@ function CollectionItems({ collectionDetail }) {
           className={`btn btn-secondary me-2 rounded-pill ${(filter === COLLECTION_KEY.Collections) && 'disabled'}`}
           onClick={() => handleFilter(COLLECTION_KEY.Collections)}
         >
-          Collected
+          Collectors
         </div>
         <hr className='hr'/>
       </div>

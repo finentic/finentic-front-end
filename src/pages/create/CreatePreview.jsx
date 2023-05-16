@@ -2,15 +2,21 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faBolt, faChain, faCircleCheck, faIdCard, faList, faTable, faTruckFast } from "@fortawesome/free-solid-svg-icons"
 import { Accordion } from "react-bootstrap"
 import CreatePreviewPictures from "./CreatePreviewPictures"
-import { useNavigate } from "react-router-dom"
-import { ACCOUNT_STATE, SHARED_ADDRESS, toAddressUrl } from "../../utils"
-import { TooltipCopy } from "../../components"
+import { ACCOUNT_STATE, SHARED_ADDRESS, toAddressUrl, toImgUrl } from "../../utils"
+import { ButtonImg, TooltipCopy } from "../../components"
 
-const CreatePreview = ({ nftFormData, pictures, eth }) => {
-    const navigate = useNavigate()
+const CreatePreview = ({ nftFormData, pictures, eth, collectionSelected }) => {
+    console.log(collectionSelected)
     return (
         <>
-            <div className='pb-2 px-1 user-select-none'>
+            <ButtonImg
+                imgUrl={collectionSelected.thumbnail ? toImgUrl(collectionSelected.thumbnail) : '/logo192.png'}
+                title={collectionSelected.name}
+                tooltip={'Collection: ' + collectionSelected.name}
+                size={36}
+                fontSize={16}
+            />
+            <div className='py-2 px-1 user-select-none'>
                 <h3 className="col col-12 pt-2 fw-bold text-third">
                     {nftFormData.name || 'Preview'}
                 </h3>
