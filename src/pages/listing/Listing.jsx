@@ -51,8 +51,8 @@ function Listing({ pageTitle }) {
 function ListForSale({ item, serviceFeePercent }) {
   const datetimeStart = new Date()
   const datetimeEnded = new Date()
-  datetimeStart.setMinutes(datetimeStart.getMinutes() - datetimeStart.getTimezoneOffset() + 1)
-  datetimeEnded.setMinutes(datetimeEnded.getMinutes() - datetimeEnded.getTimezoneOffset() + 62)
+  datetimeStart.setMinutes(datetimeStart.getMinutes() - datetimeStart.getTimezoneOffset() + 5)
+  datetimeEnded.setMinutes(datetimeEnded.getMinutes() - datetimeEnded.getTimezoneOffset() + 67)
 
   const eth = useEth()
   const navigate = useNavigate()

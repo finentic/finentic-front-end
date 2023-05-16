@@ -1,5 +1,5 @@
-import { ACCOUNT_STATE, toImgUrl } from "../../utils"
-import { ButtonImg } from "../../components"
+import { ACCOUNT_STATE, getBlockTimestamp, toImgUrl } from "../../utils"
+import { ButtonImg, TimeCountdown } from "../../components"
 import { useState } from "react"
 import { faCircleCheck } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
@@ -12,6 +12,10 @@ const ListingPreview = ({ listingForm, item }) => {
     const handleOnMouseLeave = () => {
         setShow(0)
     }
+
+    const now = getBlockTimestamp()
+    const startTime = new Date(listingForm.startTime).getTime() / 1000
+
     return (
         <div className='card rounded-3 shadow-sm shadow-hover w-25' style={{ position: 'fixed', minWidth: '250px', maxWidth: '560px' }}>
             <div
@@ -85,8 +89,29 @@ const ListingPreview = ({ listingForm, item }) => {
                     </>}
                     className='text-secondary'
                 />
-                <p className="card-text fs-5 pt-2">
-                    {listingForm.price} VND
+
+                <p className="card-text fs-6 pt-2">
+                    <span className='text-secondary'>
+                        {(listingForm.method === 'fixed')
+                            ? (<>
+                                Buy now
+                            </>)
+                            : (<>
+                                Start in: <TimeCountdown timeRemaining={startTime - now} className='text-primary' />
+                            </>)
+                        }
+                    </span>
+                    <br />
+                    {listingForm.price
+                        ? <>{(listingForm.price) + ' VND'}</>
+                        : <p className='card-text fs-6 pt-2'>
+                            <span className='text-secondary'>
+                                Available
+                            </span>
+                            <br />
+                            Not for sale
+                        </p>
+                    }
                 </p>
             </div>
 
