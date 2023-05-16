@@ -161,7 +161,7 @@ function Trading({ item, isOwner }) {
                     async (nftContract, tokenId) => (
                         nftContract.toLowerCase() === toTokenAddress(item._id).toLowerCase() &&
                         tokenId.toString() === toTokenId(item._id) &&
-                        resetState()
+                        setButtonState(BUTTON_STATE.DISABLE)
                     )
                 )
             }
