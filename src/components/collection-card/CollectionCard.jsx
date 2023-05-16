@@ -1,18 +1,11 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { toImgUrl, formatPrice, ITEM_STATE, ACCOUNT_STATE, getBlockTimestamp } from '../../utils'
+import { toImgUrl, ACCOUNT_STATE } from '../../utils'
 import { ButtonImg } from '../button-img'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCircleCheck } from '@fortawesome/free-solid-svg-icons'
-import { TimeCountdown } from '../time-countdown'
 import { ROUTERS_PATH } from '../../routers/MainRoutes'
 
-const LISTING_STATE = {
-    'BUY_NOW': 'BUY_NOW',
-    'START_SOON': 'START_SOON',
-    'ACTIVE': 'ACTIVE',
-    'ENDED': 'ENDED',
-}
 
 function CollectionCard({ collection }) {
     const navigate = useNavigate()

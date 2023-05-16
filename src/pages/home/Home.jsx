@@ -31,9 +31,6 @@ function Home(props) {
         if (filter === EXPLORE_KEY.FixedPrice) items = await exploreItemsFixedPrice()
         if (filter === EXPLORE_KEY.Auction) items = await exploreItemsAuction()
         if (filter === EXPLORE_KEY.Collections) collections = await getAllCollections()
-        
-        console.log('items',items)
-        console.log('collections',collections)
         if (!collections) {
           setItemList(items.data)
         } else {
@@ -68,13 +65,13 @@ function Home(props) {
           className={`btn btn-secondary me-2 rounded-pill ${(filter === EXPLORE_KEY.FixedPrice) && 'disabled'}`}
           onClick={() => handleFilter(EXPLORE_KEY.FixedPrice)}
         >
-          Fixed price listing
+          Buy now
         </div>
         <div
           className={`btn btn-secondary me-2 rounded-pill ${(filter === EXPLORE_KEY.Auction) && 'disabled'}`}
           onClick={() => handleFilter(EXPLORE_KEY.Auction)}
         >
-          Auction listing
+          Auction active
         </div>
       </div>
       <hr className="hr" />

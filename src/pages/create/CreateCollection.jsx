@@ -56,7 +56,6 @@ function CreateCollection({ pageTitle }) {
       collectionFormData.symbol,
       API_BASE_URI,
     )
-    console.log("collectionAddress:", collectionAddress)
 
     const formData = new FormData()
     formData.append('collection_address', collectionAddress.toLowerCase())
@@ -69,14 +68,15 @@ function CreateCollection({ pageTitle }) {
 
     try {
       const response = await createCollection(formData)
-      console.log(response.data)
-      await eth.CollectionFactoryContract.createCollection(
-        eth.account._id.toLowerCase(),
-        collectionFormData.name,
-        collectionFormData.symbol,
-        API_BASE_URI,
-      )
-      setButtonState(BUTTON_STATE.DONE)
+      if (response.data) {
+        await eth.CollectionFactoryContract.createCollection(
+          eth.account._id.toLowerCase(),
+          collectionFormData.name,
+          collectionFormData.symbol,
+          API_BASE_URI,
+        )
+        setButtonState(BUTTON_STATE.DONE)
+      }
     } catch (error) {
       console.error(error)
       setButtonState(BUTTON_STATE.REJECTED)
@@ -191,7 +191,7 @@ function CreateCollection({ pageTitle }) {
             <div className='my-3 fw-bold fst-italic text-danger'>
               <FontAwesomeIcon icon={faExclamationTriangle} /> Freeze metadata:
               <span className='fw-normal text-dark'>
-                { } Freezing metadata will permanently hash all required fields of this collection content and store that in blockchain.
+                { } Freezing metadata will permanently freeze all required fields of this collection content and store that in blockchain.
               </span>
             </div>
             {
@@ -203,7 +203,7 @@ function CreateCollection({ pageTitle }) {
         </div>
 
         <div className='col col-12 col-md-6'>
-          fd
+
         </div>
       </div>
     </div >

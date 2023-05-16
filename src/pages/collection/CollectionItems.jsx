@@ -28,7 +28,6 @@ function CollectionItems({ collectionDetail }) {
         if (filter === COLLECTION_KEY.All) items = await getAllItemOfCollection(collectionDetail._id)
         if (filter === COLLECTION_KEY.FixedPrice) items = await getAllItemsFixedPriceListingOfAccount(collectionDetail._id)
         if (filter === COLLECTION_KEY.Auction) items = await getAllItemsAuctionListingOfAccount(collectionDetail._id)
-        console.log(items)
         setItemList(items.data)
       } catch (error) {
         console.error(error)

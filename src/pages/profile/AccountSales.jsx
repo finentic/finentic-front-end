@@ -27,7 +27,6 @@ function AccountSales({ accountDetail }) {
         if (filter === SALES_KEY.Shipping) items = await getAllOrdersOfAccount(accountDetail._id)
         if (filter === SALES_KEY.Completed) items = await getAllOrdersOfAccount(accountDetail._id)
         if (filter === SALES_KEY.Canceled) items = await getAllOrdersOfAccount(accountDetail._id)
-        console.log(items)
         setItemList(items.data)
       } catch (error) {
         console.error(error)

@@ -22,7 +22,6 @@ function AccountCreated({ accountDetail }) {
       try {
         let items
         if (filter === CREATED_KEY.NFTs) items = await getAllItemsCreatedOfAccount(accountDetail._id)
-        console.log(items)
         setItemList(items.data)
       } catch (error) {
         console.error(error)

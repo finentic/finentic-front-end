@@ -28,7 +28,6 @@ function AccountCollected({ accountDetail }) {
         if (filter === COLLECTED_KEY.NFTs) items = await getAllItemsOfAccount(accountDetail._id)
         if (filter === COLLECTED_KEY.FixedPrice) items = await getAllItemsFixedPriceListingOfAccount(accountDetail._id)
         if (filter === COLLECTED_KEY.Auction) items = await getAllItemsAuctionListingOfAccount(accountDetail._id)
-        console.log(items)
         setItemList(items.data)
       } catch (error) {
         console.error(error)

@@ -6,7 +6,6 @@ import { ACCOUNT_STATE, SHARED_ADDRESS, toAddressUrl, toImgUrl } from "../../uti
 import { ButtonImg, TooltipCopy } from "../../components"
 
 const CreatePreview = ({ nftFormData, pictures, eth, collectionSelected }) => {
-    console.log(collectionSelected)
     return (
         <>
             <ButtonImg

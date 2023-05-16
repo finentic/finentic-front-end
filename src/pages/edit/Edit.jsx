@@ -17,9 +17,10 @@ function Edit() {
     const getItemList = async () => {
       try {
         const item = await getItemForUpdate(itemId)
-        console.log(item)
         setItemDetail(item.data)
-      } catch (error) { }
+      } catch (error) {
+        console.error(error)
+      }
     }
     getItemList()
     return () => setItemDetail(false)

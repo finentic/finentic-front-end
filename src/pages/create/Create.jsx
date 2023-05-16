@@ -38,7 +38,6 @@ function Create({ pageTitle }) {
         const collectionOfAccountRes = getAllCollectionOfAccount(eth.account._id)
         const collectionOfAccount = (await collectionOfAccountRes).data
         const collectionOfSharedData = (await collectionOfSharedRes).data
-        console.log('collectionOfAccount', collectionOfAccount)
         setCollections([
           collectionOfSharedData,
           ...collectionOfAccount.filter(collection => collection._id !== collectionOfSharedData._id),

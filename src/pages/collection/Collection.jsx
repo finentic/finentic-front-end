@@ -14,7 +14,6 @@ function Collection() {
   const getCollectionData = useCallback(async (_collectionId) => {
     try {
       const collectionResponse = await getCollection(_collectionId)
-      console.log(collectionResponse)
       setCollectionDetail(collectionResponse.data)
     } catch (error) {
       console.error(error)
