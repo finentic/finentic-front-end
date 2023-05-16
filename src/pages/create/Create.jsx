@@ -38,7 +38,7 @@ function Create({ pageTitle }) {
         const collectionOfAccountRes = getAllCollectionOfAccount(eth.account._id)
         const collectionOfAccount = (await collectionOfAccountRes).data
         const collectionOfSharedData = (await collectionOfSharedRes).data
-
+        console.log('collectionOfAccount', collectionOfAccount)
         setCollections([
           collectionOfSharedData,
           ...collectionOfAccount.filter(collection => collection._id !== collectionOfSharedData._id),
@@ -129,14 +129,17 @@ function Create({ pageTitle }) {
     formData.append('description', nftFormData.description)
     formData.append('external_url', nftFormData.external_url)
     formData.append('is_phygital', !!nftFormData.is_phygital)
+    for (const property of nftFormData.properties) {
+      formData.append(
+        'properties[]',
+        JSON.stringify({
+          name: property.name,
+          value: property.value,
+        })
+      )
+    }
     for (const file of currentTarget.pictures.files) {
       formData.append('files', file)
-    }
-    for (const property of nftFormData.properties) {
-      formData.append('properties', JSON.stringify({
-        name: property.name,
-        value: property.value,
-      }))
     }
     try {
       const response = await createItem(formData)
