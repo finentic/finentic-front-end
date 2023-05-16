@@ -39,7 +39,7 @@ const CollectionBodyMemo = memo(CollectionBody, (prevProps, nextProps) => prevPr
 function CollectionBody({ collectionDetail }) {
   usePageTitle(collectionDetail.name)
   const eth = useEth()
-  const isOwner = (collectionDetail.creator.toLowerCase() === eth.account?._id.toLowerCase())
+  const isOwner = (collectionDetail.creator._id.toLowerCase() === eth.account?._id.toLowerCase())
 
   return (
     <>

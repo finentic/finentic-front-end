@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { usePageTitle } from '../../hooks'
-import { exploreItems, exploreItemsAuction, exploreItemsFixedPrice } from '../../api'
+import { exploreItems, exploreItemsAuction, exploreItemsFixedPrice, getAllCollections } from '../../api'
 import { ItemCard } from '../../components/item-card/ItemCard'
+import { CollectionCard } from '../../components/collection-card'
 
 const EXPLORE_KEY = {
   NFTs: 'NFTs',
@@ -16,6 +17,7 @@ function Home(props) {
 
   const [filter, setFilter] = useState(EXPLORE_KEY.NFTs)
   const [itemList, setItemList] = useState([])
+  const [collectionList, setCollectionList] = useState([])
 
   const handleFilter = (key) => {
     setFilter(key)
@@ -24,12 +26,19 @@ function Home(props) {
   useEffect(() => {
     const getItemList = async () => {
       try {
-        let items
+        let items, collections
         if (filter === EXPLORE_KEY.NFTs) items = await exploreItems()
         if (filter === EXPLORE_KEY.FixedPrice) items = await exploreItemsFixedPrice()
         if (filter === EXPLORE_KEY.Auction) items = await exploreItemsAuction()
+        if (filter === EXPLORE_KEY.Collections) collections = await getAllCollections()
+        
         console.log('items',items)
-        setItemList(items.data)
+        console.log('collections',collections)
+        if (!collections) {
+          setItemList(items.data)
+        } else {
+          setCollectionList(collections.data)
+        }
       } catch (error) {
         console.error(error)
       }
@@ -70,7 +79,9 @@ function Home(props) {
       </div>
       <hr className="hr" />
       <div className='py-3 row'>
-        {itemList.map(item => <ItemCard item={item} key={item._id} />)}
+        {(filter !== EXPLORE_KEY.Collections) && itemList.map(item => <ItemCard item={item} key={item._id} />)}
+        {(filter === EXPLORE_KEY.Collections) && collectionList.map(collection => <CollectionCard collection={collection} key={collection._id} />)}
+        {/* {collectionList.map(item => <ItemCard item={item} key={item._id} />)} */}
       </div>
     </div>
   )

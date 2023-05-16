@@ -8,6 +8,10 @@ function getCollection(collection_address) {
   return axiosInstance.get('/collections', { params: { collection_address } })
 }
 
+function getAllCollections() {
+  return axiosInstance.get('/collections/explore')
+}
+
 function getAllCollectionOfAccount(account_address) {
   return axiosInstance.get('/collections/account', { params: { account_address } })
 }
@@ -24,6 +28,7 @@ function updateCollectionPicture(formData) {
 export {
   createCollection,
   getCollection,
+  getAllCollections,
   getAllCollectionOfAccount,
   updateCollectionDescription,
   updateCollectionPicture
