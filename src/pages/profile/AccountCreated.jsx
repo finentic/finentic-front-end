@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import {
+  getAllCollectionOfAccount,
   getAllItemsCreatedOfAccount,
 } from '../../api'
 import { ItemCard } from '../../components/item-card/ItemCard'
+import { CollectionCard } from '../../components/collection-card'
 
 const CREATED_KEY = {
   NFTs: 'NFTs',
@@ -12,6 +14,7 @@ const CREATED_KEY = {
 function AccountCreated({ accountDetail }) {
   const [filter, setFilter] = useState(CREATED_KEY.NFTs)
   const [itemList, setItemList] = useState([])
+  const [collectionList, setCollectionList] = useState([])
 
   const handleFilter = (key) => {
     setFilter(key)
@@ -20,9 +23,14 @@ function AccountCreated({ accountDetail }) {
   useEffect(() => {
     const getItemList = async () => {
       try {
-        let items
+        let items, collections
         if (filter === CREATED_KEY.NFTs) items = await getAllItemsCreatedOfAccount(accountDetail._id)
-        setItemList(items.data)
+        if (filter === CREATED_KEY.Collections) collections = await getAllCollectionOfAccount(accountDetail._id)
+        if (filter !== CREATED_KEY.Collections) {
+          setItemList(items.data)
+        } else {
+          setCollectionList(collections.data)
+        }
       } catch (error) {
         console.error(error)
       }
@@ -50,8 +58,11 @@ function AccountCreated({ accountDetail }) {
           Collections
         </div>
       </div>
-      <div className='py-3 row' hidden={filter === CREATED_KEY.Collections}>
-        {itemList.map(item => <ItemCard item={item} key={item._id} />)}
+      <div className='py-3 row'>
+        {(filter !== CREATED_KEY.Collections)
+          ? itemList.map(item => <ItemCard item={item} key={item._id} />)
+          : collectionList.map(collection => <CollectionCard collection={collection} key={collection._id} />)
+        }
       </div>
     </div>
   )

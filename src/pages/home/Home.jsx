@@ -31,7 +31,7 @@ function Home(props) {
         if (filter === EXPLORE_KEY.FixedPrice) items = await exploreItemsFixedPrice()
         if (filter === EXPLORE_KEY.Auction) items = await exploreItemsAuction()
         if (filter === EXPLORE_KEY.Collections) collections = await getAllCollections()
-        if (!collections) {
+        if (filter !== EXPLORE_KEY.Collections) {
           setItemList(items.data)
         } else {
           setCollectionList(collections.data)
@@ -65,20 +65,19 @@ function Home(props) {
           className={`btn btn-secondary me-2 rounded-pill ${(filter === EXPLORE_KEY.FixedPrice) && 'disabled'}`}
           onClick={() => handleFilter(EXPLORE_KEY.FixedPrice)}
         >
-          Buy now
+          Fixed price
         </div>
         <div
           className={`btn btn-secondary me-2 rounded-pill ${(filter === EXPLORE_KEY.Auction) && 'disabled'}`}
           onClick={() => handleFilter(EXPLORE_KEY.Auction)}
         >
-          Auction active
+          Auction
         </div>
       </div>
       <hr className="hr" />
       <div className='py-3 row'>
         {(filter !== EXPLORE_KEY.Collections) && itemList.map(item => <ItemCard item={item} key={item._id} />)}
         {(filter === EXPLORE_KEY.Collections) && collectionList.map(collection => <CollectionCard collection={collection} key={collection._id} />)}
-        {/* {collectionList.map(item => <ItemCard item={item} key={item._id} />)} */}
       </div>
     </div>
   )

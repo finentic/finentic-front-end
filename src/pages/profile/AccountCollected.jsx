@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
 import {
+  getAllCollectionOfAccount,
   getAllItemsAuctionListingOfAccount,
   getAllItemsFixedPriceListingOfAccount,
   getAllItemsOfAccount,
 } from '../../api'
 import { ItemCard } from '../../components/item-card/ItemCard'
+import { CollectionCard } from '../../components/collection-card'
 
 const COLLECTED_KEY = {
   NFTs: 'NFTs',
@@ -16,6 +18,7 @@ const COLLECTED_KEY = {
 function AccountCollected({ accountDetail }) {
   const [filter, setFilter] = useState(COLLECTED_KEY.NFTs)
   const [itemList, setItemList] = useState([])
+  const [collectionList, setCollectionList] = useState([])
 
   const handleFilter = (key) => {
     setFilter(key)
@@ -24,11 +27,16 @@ function AccountCollected({ accountDetail }) {
   useEffect(() => {
     const getItemList = async () => {
       try {
-        let items
+        let items, collections
         if (filter === COLLECTED_KEY.NFTs) items = await getAllItemsOfAccount(accountDetail._id)
+        if (filter === COLLECTED_KEY.Collections) collections = await getAllCollectionOfAccount(accountDetail._id)
         if (filter === COLLECTED_KEY.FixedPrice) items = await getAllItemsFixedPriceListingOfAccount(accountDetail._id)
         if (filter === COLLECTED_KEY.Auction) items = await getAllItemsAuctionListingOfAccount(accountDetail._id)
-        setItemList(items.data)
+        if (filter !== COLLECTED_KEY.Collections) {
+          setItemList(items.data)
+        } else {
+          setCollectionList(collections.data)
+        }
       } catch (error) {
         console.error(error)
       }
@@ -68,8 +76,12 @@ function AccountCollected({ accountDetail }) {
           Auction listing
         </div>
       </div>
-      <div className='py-3 row' hidden={filter === COLLECTED_KEY.Collections}>
-        {itemList.map(item => <ItemCard item={item} key={item._id} />)}
+      {collectionList.map(collection =>console.log(collection))}
+      <div className='py-3 row'>
+        {(filter !== COLLECTED_KEY.Collections)
+          ? itemList.map(item => <ItemCard item={item} key={item._id} />)
+          : collectionList.map(collection => <CollectionCard collection={collection} key={collection._id} />)
+        }
       </div>
     </div>
   )
