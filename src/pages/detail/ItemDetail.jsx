@@ -1,6 +1,8 @@
 import {
+  BUTTON_STATE,
   ITEM_STATE,
   toImgUrl,
+  toTokenAddress,
   toTokenId,
 } from '../../utils'
 import {
@@ -16,7 +18,7 @@ import {
   Button,
   Carousel,
 } from 'react-bootstrap';
-import { ImgBgBlur, ModalImg } from '../../components';
+import { ButtonSubmit, ImgBgBlur, ModalImg } from '../../components';
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useEth } from '../../contexts';
@@ -69,7 +71,7 @@ function ItemDetail({ pageTitle }) {
       )
       return () => eth.MarketplaceContract.removeAllListeners()
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [eth.MarketplaceContract, itemId])
 
   if (!itemDetail._id || !eth.account) return null
@@ -83,10 +85,44 @@ function Detail({ item }) {
   const isOwner = (item.owner._id.toLowerCase() === eth.account._id.toLowerCase())
   const [modalItemPictureUrl, setModalItemPictureUrl] = useState(undefined)
   const [isShowModalItemPicture, setIsShowModalItemPicture] = useState(false)
+  const [buttonState, setButtonState] = useState(BUTTON_STATE.ENABLE)
 
   const setModalItemPicture = (url) => {
     setModalItemPictureUrl(url)
     setIsShowModalItemPicture(!isShowModalItemPicture)
+  }
+
+  const resetState = () => {
+    setButtonState(BUTTON_STATE.ENABLE)
+  }
+
+  const handleDelisting = async event => {
+    event.preventDefault()
+    setButtonState(BUTTON_STATE.PENDING)
+    try {
+      if (item.start_time) {
+        await eth.MarketplaceContract.cancelListItemForAuction(
+          toTokenAddress(item._id),
+          toTokenId(item._id),
+        )
+      } else {
+        await eth.MarketplaceContract.cancelListItemForBuyNow(
+          toTokenAddress(item._id),
+          toTokenId(item._id),
+        )
+      }
+      eth.MarketplaceContract.on(
+        'RemoveItemForBuyNow',
+        async (nftContract, tokenId) => (
+          nftContract.toLowerCase() === toTokenAddress(item._id).toLowerCase() &&
+          tokenId.toString() === toTokenId(item._id) &&
+          setButtonState(BUTTON_STATE.DONE)
+        )
+      )
+    } catch (error) {
+      console.error(error)
+      setButtonState(BUTTON_STATE.REJECTED)
+    }
   }
 
   return (
@@ -111,6 +147,15 @@ function Detail({ item }) {
                 >
                   List for sale
                 </Button>
+              )}
+              {(item.state === ITEM_STATE.LISTING) && (
+                <ButtonSubmit
+                  buttonState={buttonState}
+                  resetState={resetState}
+                  title='Delisting'
+                  className='btn-outline-primary btn-lg fs-6 fw-bold'
+                  onClick={handleDelisting}
+                />
               )}
             </div>
           </div>
@@ -232,7 +277,7 @@ function Detail({ item }) {
             ownership_history={item.ownership_history}
           />
 
-          <Trading item={item} isOwner={isOwner}/>
+          <Trading item={item} isOwner={isOwner} />
 
           <CardInfo icon={faReceipt} title='Price History' defaultActive>
             <PriceHistory

@@ -4,21 +4,30 @@ import { faExclamationCircle, faCheckCircle } from '@fortawesome/free-solid-svg-
 import Spinner from 'react-bootstrap/Spinner'
 import { BUTTON_STATE } from "../../utils";
 
-function ButtonSubmit({ buttonState, resetState, title }) {
+function ButtonSubmit({
+    buttonState,
+    resetState,
+    title,
+    onClick,
+    className = 'btn-primary fw-bold px-5',
+    classNameRejected = 'btn-danger fw-bold px-5'
+}) {
 
     if (buttonState === BUTTON_STATE.DISABLE) return (
         <button
-            className='btn btn-primary fw-bold px-5'
+            className={'btn ' + className}
             type='submit'
-            disabled>
+            disabled
+        >
             {title}
         </button>
     )
 
     if (buttonState === BUTTON_STATE.ENABLE) return (
         <button
-            className='btn btn-primary fw-bold px-5'
+            className={'btn ' + className}
             type='submit'
+            onClick={onClick}
         >
             {title}
         </button>
@@ -26,7 +35,7 @@ function ButtonSubmit({ buttonState, resetState, title }) {
 
     if (buttonState === BUTTON_STATE.PENDING) return (
         <button
-            className='btn btn-secondary fw-bold px-5'
+            className={'btn ' + className}
             type='submit'
             disabled
         >
@@ -42,7 +51,7 @@ function ButtonSubmit({ buttonState, resetState, title }) {
 
     if (buttonState === BUTTON_STATE.DONE) return (
         <button
-            className='btn btn-primary fw-bold px-5'
+            className={'btn ' + className}
             type='button'
             onClick={resetState}
         >
@@ -52,7 +61,7 @@ function ButtonSubmit({ buttonState, resetState, title }) {
 
     if (buttonState === BUTTON_STATE.REJECTED) return (
         <button
-            className='btn btn-danger fw-bold px-5'
+            className={'btn ' + classNameRejected}
             type='button'
             onClick={resetState}
         >
@@ -62,7 +71,7 @@ function ButtonSubmit({ buttonState, resetState, title }) {
 
     return (
         <button
-            className='btn btn-primary fw-bold px-5'
+            className={'btn ' + className}
             type='submit'
             disabled
         >

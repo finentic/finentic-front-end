@@ -140,7 +140,6 @@ function Trading({ item, isOwner }) {
 
     const handleBuyNow = async event => {
         event.preventDefault()
-        event.preventDefault()
         setButtonState(BUTTON_STATE.PENDING)
         try {
             const price = parseUnits(item.price, '0')
