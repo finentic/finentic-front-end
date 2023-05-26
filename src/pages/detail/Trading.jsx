@@ -13,7 +13,7 @@ import {
     toTokenAddress,
 } from "../../utils"
 import { commify, parseUnits } from "ethers/lib/utils"
-import { faBriefcaseClock, faTag } from "@fortawesome/free-solid-svg-icons"
+import { faBriefcaseClock, faCalendarAlt, faTag } from "@fortawesome/free-solid-svg-icons"
 import { Dropdown, DropdownButton, Form, InputGroup } from "react-bootstrap"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { useEth } from "../../contexts"
@@ -38,6 +38,7 @@ function Trading({ item, isOwner }) {
     const ref = useRef(null)
     const eth = useEth()
     const [buttonState, setButtonState] = useState(BUTTON_STATE.ENABLE)
+    const [buttonReceivedState, setButtonReceivedState] = useState(BUTTON_STATE.ENABLE)
     const [cursor, setCursor] = useState(0)
     const [auctionForm, setAuctionForm] = useState({
         price: formatPrice(item.price || '0'),
@@ -64,6 +65,10 @@ function Trading({ item, isOwner }) {
 
     const resetState = () => {
         setButtonState(BUTTON_STATE.ENABLE)
+    }
+
+    const resetButtonReceivedState = () => {
+        setButtonReceivedState(BUTTON_STATE.ENABLE)
     }
 
     const resetStateAndSetNewPrice = () => {
@@ -170,6 +175,64 @@ function Trading({ item, isOwner }) {
         }
     }
 
+    const handleCancelDelivery = async event => {
+        event.preventDefault()
+        setButtonState(BUTTON_STATE.PENDING)
+        try {
+            if (item.start_time) {
+                await eth.MarketplaceContract.cancelItemAuction(
+                    toTokenAddress(item._id),
+                    toTokenId(item._id),
+                )
+            } else {
+                await eth.MarketplaceContract.cancelItemBuyNow(
+                    toTokenAddress(item._id),
+                    toTokenId(item._id),
+                )
+            }
+            eth.MarketplaceContract.on(
+                'RemoveItemForBuyNow',
+                async (nftContract, tokenId) => (
+                    nftContract.toLowerCase() === toTokenAddress(item._id).toLowerCase() &&
+                    tokenId.toString() === toTokenId(item._id) &&
+                    setButtonState(BUTTON_STATE.DISABLE)
+                )
+            )
+        } catch (error) {
+            console.error(error)
+            setButtonState(BUTTON_STATE.REJECTED)
+        }
+    }
+
+    const handleItemReceived = async event => {
+        event.preventDefault()
+        setButtonReceivedState(BUTTON_STATE.PENDING)
+        try {
+            if (item.start_time) {
+                await eth.MarketplaceContract.confirmReceivedItemAuction(
+                    toTokenAddress(item._id),
+                    toTokenId(item._id),
+                )
+            } else {
+                await eth.MarketplaceContract.confirmReceivedItemBuyNow(
+                    toTokenAddress(item._id),
+                    toTokenId(item._id),
+                )
+            }
+            eth.MarketplaceContract.on(
+                'RemoveItemForBuyNow',
+                async (nftContract, tokenId) => (
+                    nftContract.toLowerCase() === toTokenAddress(item._id).toLowerCase() &&
+                    tokenId.toString() === toTokenId(item._id) &&
+                    setButtonReceivedState(BUTTON_STATE.DISABLE)
+                )
+            )
+        } catch (error) {
+            console.error(error)
+            setButtonReceivedState(BUTTON_STATE.REJECTED)
+        }
+    }
+
     if (item.state === ITEM_STATE.LISTING) return (
         <div className="card rounded-3">
             <div className="card-header py-3">
@@ -263,6 +326,42 @@ function Trading({ item, isOwner }) {
                     </div>
                 </div>
             ))}
+        </div>
+    )
+
+    if (item.state === ITEM_STATE.SOLD) return (
+        <div className="card rounded-3">
+            <div className="card-header py-3">
+                <div className='fw-bold float-start'>
+                    <FontAwesomeIcon icon={faCalendarAlt} className="me-2" />
+                    Deadline: {timestampToDate(Number(item.next_update_deadline + '000'))}
+                </div>
+            </div>
+            <div className="card-body">
+                <div className="row">
+                    <div className="col col-12 col-lg-6 p-2" hidden={isOwner}>
+                        <ButtonSubmit
+                            buttonState={buttonReceivedState}
+                            resetState={resetButtonReceivedState}
+                            title={'Item received'}
+                            onClick={handleItemReceived}
+                        />
+                    </div>
+                    <div className="col col-12 col-lg-6 p-2 text-start text-lg-end">
+                        <ButtonSubmit
+                            buttonState={buttonState}
+                            resetState={resetState}
+                            title={'Cancel delivery'}
+                            className="btn-outline-secondary fw-bold px-5"
+                            onClick={handleCancelDelivery}
+                        />
+                    </div>
+                </div>
+            </div>
+
+            <div className="card-footer text-secondary">
+                Remaining: <TimeCountdown timeRemaining={Number(item.next_update_deadline) - getBlockTimestamp()} className='text-danger' />
+            </div>
         </div>
     )
 
