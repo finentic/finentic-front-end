@@ -49,23 +49,6 @@ const About = ({ item }) => {
             </div>
             <br />
 
-            {item.external_url && <>
-                <div className="float-start">
-                    <strong className='text-third pe-2'>
-                        External URL:
-                    </strong>
-                </div>
-                <div className="float-end">
-                    <a
-                        className='overflow-hidden text-wrap text-break text-secondary'
-                        href={item.external_url}
-                    >
-                        {item.external_url}
-                    </a>
-                </div>
-                <br />
-            </>}
-
             <div className="float-start">
                 <strong className='text-third pe-2'>
                     Raw data url:
@@ -98,6 +81,24 @@ const About = ({ item }) => {
                 </TooltipCopy>
             </div>
             <br />
+
+
+            {item.external_url && <>
+                <div className="">
+                    <strong className='text-third pe-2'>
+                        External URL:
+                    </strong>
+                </div>
+                <div className="">
+                    <a
+                        className='overflow-hidden text-wrap text-break text-secondary'
+                        href={item.external_url}
+                    >
+                        {item.external_url}
+                    </a>
+                </div>
+                <br />
+            </>}
         </div >
     )
 }
