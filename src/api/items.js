@@ -65,8 +65,38 @@ function getAllItemsCreatedOfAccount(account_address) {
   return axiosInstance.get('/items/account/created', { params: { account_address } })
 }
 
-function getAllOrdersOfAccount(account_address) {
+// ACCOUNT ITEMS SALES ORDER
+function getAllSalesItemsOfAccount(account_address) {
   return axiosInstance.get('/items/account/orders/sales', { params: { account_address } })
+}
+
+function getAllShippingSalesItemsOfAccount(account_address) {
+  return axiosInstance.get('/items/account/orders/sales/shipping', { params: { account_address } })
+}
+
+function getAllDeliveredSalesItemsOfAccount(account_address) {
+  return axiosInstance.get('/items/account/orders/sales/delivered', { params: { account_address } })
+}
+
+function getAllCanceledSalesItemsOfAccount(account_address) {
+  return axiosInstance.get('/items/account/orders/sales/canceled', { params: { account_address } })
+}
+
+// ACCOUNT ITEMS PURCHASE ORDER
+function getAllPurchaseItemsOfAccount(account_address) {
+  return axiosInstance.get('/items/account/orders/purchase', { params: { account_address } })
+}
+
+function getAllShippingPurchaseItemsOfAccount(account_address) {
+  return axiosInstance.get('/items/account/orders/purchase/shipping', { params: { account_address } })
+}
+
+function getAllDeliveredPurchaseItemsOfAccount(account_address) {
+  return axiosInstance.get('/items/account/orders/purchase/delivered', { params: { account_address } })
+}
+
+function getAllCanceledPurchaseItemsOfAccount(account_address) {
+  return axiosInstance.get('/items/account/orders/purchase/canceled', { params: { account_address } })
 }
 
 // COLLECTION
@@ -86,10 +116,21 @@ export {
   updateItem,
   createItem,
   getItemForUpdate,
+
+  getAllItemOfCollection,
+
   getAllItemsOfAccount,
   getAllItemsFixedPriceListingOfAccount,
   getAllItemsAuctionListingOfAccount,
   getAllItemsCreatedOfAccount,
-  getAllOrdersOfAccount,
-  getAllItemOfCollection,
+
+  getAllPurchaseItemsOfAccount,
+  getAllCanceledPurchaseItemsOfAccount,
+  getAllDeliveredPurchaseItemsOfAccount,
+  getAllShippingPurchaseItemsOfAccount,
+
+  getAllCanceledSalesItemsOfAccount,
+  getAllDeliveredSalesItemsOfAccount,
+  getAllSalesItemsOfAccount,
+  getAllShippingSalesItemsOfAccount,
 }

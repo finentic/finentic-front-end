@@ -8,6 +8,7 @@ import { useEth } from '../../contexts'
 import { AccountCreated } from './AccountCreated'
 import { AccountCollected } from './AccountCollected'
 import { AccountSales } from './AccountSales'
+import { AccountPurchase } from './AccountPurchase'
 
 
 function Profile() {
@@ -66,16 +67,7 @@ function ProfileBody({ accountDetail }) {
               <AccountSales accountDetail={accountDetail} />
             </Tab>
             <Tab eventKey="purchase" title="Purchase order">
-              <div className='p-3' style={{
-                background: '#fff',
-                backgroundImage: 'linear-gradient(235deg, #fff, #f8f9fa)',
-              }}>
-                <div className='btn btn-secondary me-2 rounded-pill disabled'>All orders</div>
-                <div className='btn btn-secondary me-2 rounded-pill'>Shipping</div>
-                <div className='btn btn-secondary me-2 rounded-pill'>Completed</div>
-                <div className='btn btn-secondary me-2 rounded-pill'>Canceled</div>
-              </div>
-              {/* <MyOrder accountId={this.props.account._id} web3={this.props.web3} order='purchase' /> */}
+              <AccountPurchase accountDetail={accountDetail} />
             </Tab>
           </Tabs>
         </div>

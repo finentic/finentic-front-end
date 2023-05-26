@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react'
 import {
-  getAllOrdersOfAccount,
+  getAllSalesItemsOfAccount,
+  getAllShippingSalesItemsOfAccount,
+  getAllDeliveredSalesItemsOfAccount,
+  getAllCanceledSalesItemsOfAccount,
 } from '../../api'
 import { ItemCard } from '../../components/item-card/ItemCard'
 
@@ -23,10 +26,10 @@ function AccountSales({ accountDetail }) {
     const getItemList = async () => {
       try {
         let items
-        if (filter === SALES_KEY.All) items = await getAllOrdersOfAccount(accountDetail._id)
-        if (filter === SALES_KEY.Shipping) items = await getAllOrdersOfAccount(accountDetail._id)
-        if (filter === SALES_KEY.Completed) items = await getAllOrdersOfAccount(accountDetail._id)
-        if (filter === SALES_KEY.Canceled) items = await getAllOrdersOfAccount(accountDetail._id)
+        if (filter === SALES_KEY.All) items = await getAllSalesItemsOfAccount(accountDetail._id)
+        if (filter === SALES_KEY.Shipping) items = await getAllShippingSalesItemsOfAccount(accountDetail._id)
+        if (filter === SALES_KEY.Completed) items = await getAllDeliveredSalesItemsOfAccount(accountDetail._id)
+        if (filter === SALES_KEY.Canceled) items = await getAllCanceledSalesItemsOfAccount(accountDetail._id)
         setItemList(items.data)
       } catch (error) {
         console.error(error)

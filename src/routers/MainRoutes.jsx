@@ -31,7 +31,7 @@ const MainRoutes = () => {
   return (
     <>
       <NavigationBar />
-      <div style={{ marginTop: "50px" }} className="bg-light">
+      <div style={{ paddingTop: "50px" , minHeight: '100vh'}} className="bg-light">
         <Routes >
           <Route path="/">
             <Route index element={<Home pageTitle="Home" />} />
