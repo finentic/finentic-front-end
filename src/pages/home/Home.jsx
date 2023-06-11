@@ -11,8 +11,7 @@ const EXPLORE_KEY = {
   Auction: 'Auction',
 }
 
-function Home(props) {
-  const { pageTitle } = props
+function Home({ pageTitle }) {
   usePageTitle(pageTitle)
 
   const [filter, setFilter] = useState(EXPLORE_KEY.NFTs)
@@ -48,7 +47,7 @@ function Home(props) {
     <div className='container'>
       <h2 className='pt-5'>Explore</h2>
       <hr className="hr" />
-      <div>
+      <div style={{ overflowX: 'auto', whiteSpace: 'nowrap' }} className='scrollbar-hidden'>
         <div
           className={`btn btn-secondary me-2 rounded-pill ${(filter === EXPLORE_KEY.NFTs) && 'disabled'}`}
           onClick={() => handleFilter(EXPLORE_KEY.NFTs)}
