@@ -1,9 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { toImgUrl, formatPrice, ITEM_STATE, ACCOUNT_STATE, getBlockTimestamp } from '../../utils'
+import { toImgUrl, formatPrice, ITEM_STATE, getBlockTimestamp } from '../../utils'
 import { ButtonImg } from '../button-img'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCircleCheck } from '@fortawesome/free-solid-svg-icons'
 import { TimeCountdown } from '../time-countdown'
 
 const LISTING_STATE = {
@@ -38,6 +36,8 @@ function ItemCard({ item }) {
     }
 
     const listingState = getListingState()
+
+    if (!item.from_collection) return null
 
     return (
         <div className='col-12 col-sm-6 col-lg-4 col-xl-3 mb-4'        >
@@ -107,21 +107,7 @@ function ItemCard({ item }) {
                 </div>
 
                 <div className="card-body p-2">
-                    <ButtonImg
-                        imgUrl={toImgUrl(item.owner.thumbnail)}
-                        title={<>
-                            {item.owner.name} {(item.owner.status === ACCOUNT_STATE.VERIFIED) && <FontAwesomeIcon
-                                icon={faCircleCheck}
-                                className='text-primary ps-1 pt-1'
-                            />}
-                        </>}
-                        className='text-secondary'
-                        onClick={event => {
-                            event.stopPropagation()
-                            navigate(`/account/${item.owner._id}`)
-                        }}
-                    />
-                    {(item.state !== ITEM_STATE.LISTING) && <p className='card-text fs-6 pt-2'>
+                    {(item.state !== ITEM_STATE.LISTING) && <p className='card-text fs-6'>
                         <span className='text-secondary'>
                             Available
                         </span>
@@ -129,7 +115,7 @@ function ItemCard({ item }) {
                         Not for sale
                     </p>}
 
-                    {(item.state === ITEM_STATE.LISTING) && <p className="card-text fs-6 pt-2">
+                    {(item.state === ITEM_STATE.LISTING) && <p className="card-text fs-6">
                         <span className='text-secondary'>
                             {(listingState === LISTING_STATE.START_SOON) && (<>
                                 Start in: <TimeCountdown timeRemaining={Number(item.start_time) - getBlockTimestamp()} className='text-primary' />

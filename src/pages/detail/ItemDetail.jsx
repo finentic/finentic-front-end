@@ -6,15 +6,10 @@ import {
   toTokenId,
 } from '../../utils'
 import {
-  faChain,
-  faIdCard,
-  faList,
   faReceipt,
-  faTable,
   faUserFriends,
 } from '@fortawesome/free-solid-svg-icons';
 import {
-  Accordion,
   Button,
   Carousel,
 } from 'react-bootstrap';
@@ -24,13 +19,12 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useEth } from '../../contexts';
 import { usePageTitle } from '../../hooks';
 import { getItemById } from '../../api';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import About from './About';
 import CardInfo from './CardInfo';
 import ItemInfo from './ItemInfo';
 import Trading from './Trading';
 import OwnershipHistory from './OwnershipHistory';
 import PriceHistory from './PriceHistory';
+import ItemDescription from './ItemDescription';
 
 function ItemDetail({ pageTitle }) {
   const eth = useEth()
@@ -43,7 +37,6 @@ function ItemDetail({ pageTitle }) {
     if (eth.MarketplaceContract && (itemId !== itemDetail._id)) {
       const getItemDetail = async () => {
         const item = await getItemById(itemId)
-        console.log(item.data)
         if (item.data === null) navigate('/404')
         setItemDetail({ ...itemDetail, ...item.data })
       }
@@ -51,21 +44,28 @@ function ItemDetail({ pageTitle }) {
       eth.MarketplaceContract.on(
         'BiddingForAuction',
         async (nftContract, tokenId) => (
-          nftContract.toLowerCase() === eth.SharedContract.address.toLowerCase() &&
+          nftContract.toLowerCase() === toTokenAddress(itemId).toLowerCase() &&
           tokenId.toString() === toTokenId(itemId)
         ) && getItemDetail()
       )
       eth.MarketplaceContract.on(
         'Invoice',
         async (_buyer, _seller, nftContract, tokenId) => (
-          nftContract.toLowerCase() === eth.SharedContract.address.toLowerCase() &&
+          nftContract.toLowerCase() === toTokenAddress(itemId).toLowerCase() &&
           tokenId.toString() === toTokenId(itemId)
         ) && getItemDetail()
       )
       eth.MarketplaceContract.on(
         'RemoveItemForBuyNow',
         async (nftContract, tokenId) => (
-          nftContract.toLowerCase() === eth.SharedContract.address.toLowerCase() &&
+          nftContract.toLowerCase() === toTokenAddress(itemId).toLowerCase() &&
+          tokenId.toString() === toTokenId(itemId)
+        ) && getItemDetail()
+      )
+      eth.MarketplaceContract.on(
+        'RemoveItemForAuction',
+        async (nftContract, tokenId) => (
+          nftContract.toLowerCase() === toTokenAddress(itemId).toLowerCase() &&
           tokenId.toString() === toTokenId(itemId)
         ) && getItemDetail()
       )
@@ -111,14 +111,6 @@ function Detail({ item }) {
           toTokenId(item._id),
         )
       }
-      eth.MarketplaceContract.on(
-        'RemoveItemForBuyNow',
-        async (nftContract, tokenId) => (
-          nftContract.toLowerCase() === toTokenAddress(item._id).toLowerCase() &&
-          tokenId.toString() === toTokenId(item._id) &&
-          setButtonState(BUTTON_STATE.DONE)
-        )
-      )
     } catch (error) {
       console.error(error)
       setButtonState(BUTTON_STATE.REJECTED)
@@ -165,7 +157,7 @@ function Detail({ item }) {
 
       <div className='row row-cols-2'>
         <div className='col col-12 col-md-6'>
-          <div className='py-3'>
+          <div className='py-2'>
             <div className='rounded-3 border h-100 w-100' >
               {(item.pictures.length > 1)
                 ? <Carousel fade interval={null} pause={'hover'}>
@@ -188,6 +180,7 @@ function Detail({ item }) {
               }
             </div>
           </div>
+
           <ModalImg
             show={isShowModalItemPicture}
             onHide={() => setModalItemPicture(item.pictures[0].file_uri)}
@@ -196,88 +189,25 @@ function Detail({ item }) {
             imgSrc={toImgUrl(modalItemPictureUrl)}
           />
 
-          <div className='py-3'>
-            <div className='rounded-3 h-100 w-100' style={{ whiteSpace: 'pre-line' }}>
-              <Accordion defaultActiveKey={['Description']} alwaysOpen>
-                <Accordion.Item eventKey='Description'>
-                  <Accordion.Header>
-                    <FontAwesomeIcon icon={faList} />
-                    <span className='fw-bold ms-2'>
-                      Description
-                    </span>
-                  </Accordion.Header>
-                  <Accordion.Body className='bg-light'>
-                    {item.description || <div className='text-center text-secondary fw-bold'>
-                      This item has no description yet. {'\n'} Contact the owner about setting it up.
-                    </div>}
-                  </Accordion.Body>
-                </Accordion.Item>
-
-                <Accordion.Item eventKey='Properties' hidden={(!item.properties.length)}>
-                  <Accordion.Header>
-                    <FontAwesomeIcon icon={faTable} />
-                    <span className='fw-bold ms-2'>
-                      Properties
-                    </span>
-                  </Accordion.Header>
-                  <Accordion.Body className='bg-light'>
-                    <div className='row py-n3'>
-                      {item.properties.map(property => (
-                        <div key={property._id} className='col-6 text-center p-2'>
-                          <div className='card p-2'>
-                            <div className='fw-bold text-secondary text-decoration-uppercase'>
-                              {property.name}
-                            </div>
-                            <div className='fw-bold text-third'>
-                              {property.value}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </Accordion.Body>
-                </Accordion.Item>
-
-                <Accordion.Item eventKey={'About ' + item.creator.name}>
-                  <Accordion.Header>
-                    <FontAwesomeIcon icon={faIdCard} />
-                    <span className='fw-bold ms-2'>
-                      {'About ' + item.creator.name}
-                    </span>
-                  </Accordion.Header>
-                  <Accordion.Body className='bg-light'>
-                    {item.creator.bio || <div className='text-center text-secondary fw-bold'>
-                      This creator has no bio yet. {'\n'} Contact the creator about setting it up.
-                    </div>}
-                  </Accordion.Body>
-                </Accordion.Item>
-
-                <Accordion.Item eventKey='Details'>
-                  <Accordion.Header>
-                    <FontAwesomeIcon icon={faChain} />
-                    <span className='fw-bold ms-2'>
-                      Details
-                    </span>
-                  </Accordion.Header>
-                  <Accordion.Body className='bg-light'>
-                    <About item={item} />
-                  </Accordion.Body>
-                </Accordion.Item>
-              </Accordion>
-            </div>
+          <div className='py-2 d-none d-md-block'>
+            <ItemDescription item={item} />
           </div>
         </div>
 
         <div className='col col-12 col-md-6'>
           <ItemInfo
             name={item.name}
-            is_phygital={item.is_phygital}
             from_collection={item.from_collection}
             owner={item.owner}
-            ownership_history={item.ownership_history}
           />
 
-          <Trading item={item} isOwner={isOwner} />
+          <div className='py-2'>
+            <Trading item={item} isOwner={isOwner} />
+          </div>
+
+          <div className='py-2 d-block d-md-none'>
+            <ItemDescription item={item} />
+          </div>
 
           <CardInfo icon={faReceipt} title='Price History' defaultActive>
             <PriceHistory

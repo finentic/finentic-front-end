@@ -3,7 +3,7 @@ import { Accordion } from "react-bootstrap"
 
 const CardInfo = ({ children, maxHeight, className, title, icon, defaultActive }) => {
     return (
-        <div className='py-3'>
+        <div className='py-2'>
             <div className={`rounded-3 h-100 w-100 ${className}`} style={maxHeight ?? { maxHeight: maxHeight, }}>
                 <Accordion defaultActiveKey={defaultActive && title}>
                     <Accordion.Item eventKey={title}>

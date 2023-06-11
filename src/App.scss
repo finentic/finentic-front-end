@@ -33,6 +33,15 @@ $theme-colors: (
   cursor: text;
 }
 
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hidden {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
 .text-line {
   white-space: pre-line;
 }
@@ -84,6 +93,10 @@ $theme-colors: (
   border: none;
   color: #353840 !important;
   background-color: #fff !important;
+}
+
+.navbar-toggler {
+  padding: 0 8px !important;
 }
 
 .input-transparent {

@@ -2,11 +2,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { ButtonImg } from "../../components"
 import { ACCOUNT_STATE, formatPrice, timestampToDate, toImgUrl, toTxUrl } from "../../utils"
 import { faCircleCheck, faClockRotateLeft } from "@fortawesome/free-solid-svg-icons"
+import { Image } from "react-bootstrap"
 
 const PriceHistory = ({ price_history, navigate }) => {
     return (
-        <>
-            <table className="table" hidden={(!price_history.length)}>
+        <div className="table-responsive">
+            <table className="table text-nowrap" hidden={(!price_history.length)}>
                 <thead>
                     <tr>
                         <th scope="col">Offerer</th>
@@ -16,18 +17,26 @@ const PriceHistory = ({ price_history, navigate }) => {
                 </thead>
                 <tbody>
                     {price_history.map(priceHistory => (
-                        <tr key={priceHistory.timestamp}>
-                            <td>
-                                <ButtonImg
-                                    imgUrl={toImgUrl(priceHistory.account.thumbnail)}
-                                    title={<>
-                                        {priceHistory.account.name} {(priceHistory.account.status === ACCOUNT_STATE.VERIFIED) && <FontAwesomeIcon
-                                            icon={faCircleCheck}
-                                            className='text-primary ps-1 pt-1'
-                                        />}
-                                    </>}
-                                    onClick={() => navigate(`/account/${priceHistory.account._id}`)}
+                        <tr key={priceHistory.tx_hash}>
+                            <td
+                                className="cursor-pointer"
+                                onClick={() => navigate(`/account/${priceHistory.account._id}`)}
+                            >
+                                <Image
+                                    src={toImgUrl(priceHistory.account.thumbnail)}
+                                    height={24}
+                                    style={{
+                                        marginTop: '-4px',
+                                        borderRadius: 'var(--bs-border-radius-sm)',
+                                    }}
                                 />
+                                <span className="ms-2 fw-bold text-third" style={{ fontSize: 16 }}>
+                                    {priceHistory.account.name}
+                                    {(priceHistory.account.status === ACCOUNT_STATE.VERIFIED) && <FontAwesomeIcon
+                                        icon={faCircleCheck}
+                                        className='text-primary ps-1 pt-1'
+                                    />}
+                                </span>
                             </td>
                             <td>
                                 {formatPrice(priceHistory.amount)} VND
@@ -52,7 +61,7 @@ const PriceHistory = ({ price_history, navigate }) => {
                 <br />
                 No events have occurred yet
             </div>
-        </>
+        </div>
     )
 }
 

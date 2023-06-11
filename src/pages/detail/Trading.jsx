@@ -13,7 +13,7 @@ import {
     toTokenAddress,
 } from "../../utils"
 import { commify, parseUnits } from "ethers/lib/utils"
-import { faBriefcaseClock, faCalendarAlt, faTag } from "@fortawesome/free-solid-svg-icons"
+import { faBolt, faBriefcaseClock, faCalendarAlt, faTag, faTruckFast } from "@fortawesome/free-solid-svg-icons"
 import { Dropdown, DropdownButton, Form, InputGroup } from "react-bootstrap"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { useEth } from "../../contexts"
@@ -153,7 +153,7 @@ function Trading({ item, isOwner }) {
                 await eth.VietnameseDong.approve(MARKETPLACE_ADDRESS, price)
                 eth.VietnameseDong.on(
                     'Approval',
-                    async (owner) => (owner.toLowerCase() === eth.account._id) && setButtonState(BUTTON_STATE.DONE)
+                    async owner => (owner.toLowerCase() === eth.account._id) && setButtonState(BUTTON_STATE.DONE),
                 )
             } else {
                 await eth.MarketplaceContract.buyNow(
@@ -166,7 +166,7 @@ function Trading({ item, isOwner }) {
                         nftContract.toLowerCase() === toTokenAddress(item._id).toLowerCase() &&
                         tokenId.toString() === toTokenId(item._id) &&
                         setButtonState(BUTTON_STATE.DISABLE)
-                    )
+                    ),
                 )
             }
         } catch (error) {
@@ -253,17 +253,22 @@ function Trading({ item, isOwner }) {
             <div className="card-body">
                 <form onSubmit={(!item.start_time) ? handleBuyNow : handlePlaceBid}>
                     <div className='col'>
-                        <p>
-                            {item.start_time ? 'Top bid' : 'Price'}: <br />
-                            <span className='fs-4 fw-bold'>
-                                {newPrice || (formatPrice(item.price))} VND
-                            </span>
-                        </p>
+                        <span className='fs-4 fw-bold'>
+                            {newPrice || (formatPrice(item.price))} VND
+                        </span>
+                        <div className='text-secondary' hidden={!item.is_phygital}>
+                            <FontAwesomeIcon icon={faTruckFast} className='me-2' />
+                            Required shipping
+                        </div>
+                        <div className='text-secondary' hidden={item.is_phygital}>
+                            <FontAwesomeIcon icon={faBolt} className='me-2' />
+                            Not required shipping
+                        </div>
                     </div>
 
                     <div hidden={isOwner}>
                         {(getListingState() === LISTING_STATE.ACTIVE) && (
-                            <div className='form-group py-3'>
+                            <div className='form-group'>
                                 <span className='fw-bold fs-5'>
                                     Place a bid
                                 </span>
@@ -295,6 +300,7 @@ function Trading({ item, isOwner }) {
                                 </InputGroup>
                             </div>
                         )}
+                        <div style={{ height: 16 }}/>
                         <ButtonSubmit
                             buttonState={(
                                 getListingState() === LISTING_STATE.BUY_NOW || isWinner || (
@@ -312,7 +318,7 @@ function Trading({ item, isOwner }) {
                         />
                     </div>
                 </form>
-            </div>
+            </div >
 
             {(item.start_time && (
                 <div className="card-footer">
@@ -325,8 +331,9 @@ function Trading({ item, isOwner }) {
                         </div>
                     </div>
                 </div>
-            ))}
-        </div>
+            ))
+            }
+        </div >
     )
 
     if (item.state === ITEM_STATE.SOLD) return (

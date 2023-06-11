@@ -11,7 +11,7 @@ function Collection() {
   const { collectionId } = useParams()
   const [collectionDetail, setCollectionDetail] = useState()
 
-  const getCollectionData = useCallback(async (_collectionId) => {
+  const getCollectionData = useCallback(async _collectionId => {
     try {
       const collectionResponse = await getCollection(_collectionId)
       setCollectionDetail(collectionResponse.data)

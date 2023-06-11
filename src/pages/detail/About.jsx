@@ -58,8 +58,7 @@ const About = ({ item }) => {
                 <TooltipCopy
                     className='text-break text-secondary'
                     contentLink={toRawUrl(item._id)}
-                    contentLinkTooltip='Open in new tab'
-                    contentCopy={item.from_collection._id}
+                    contentCopy={toRawUrl(item._id)}
                 >
                     {formatHexString(item._id, 5, 8)}
                 </TooltipCopy>
@@ -73,7 +72,6 @@ const About = ({ item }) => {
             </div>
             <div className="float-end">
                 <TooltipCopy
-                    title={item.hashed_metadata}
                     contentCopy={item.hashed_metadata}
                     className='text-secondary'
                 >

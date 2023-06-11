@@ -12,18 +12,9 @@ const formatHexString = (hexString, start = 3, end = 3) => hexString.substring(0
 const toTokenId = (itemId) => itemId.substring(43)
 const toTokenAddress = (itemId) => itemId.substring(0, 42)
 const formatPrice = (price) => commify(Number(formatUnits(price, '18')))
-const timestampToDate = (timestamp) => {
-    const date = new Date(timestamp).toLocaleString(undefined, {
-        hour12: false,
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-    }).replace(',', ' - ')
-    return date.substring(3, 6) + date.substring(0, 2) + date.substring(5) 
-}
+const timestampToDate = (timestamp) => new Date(timestamp)
+    .toLocaleString('en-GB', { hour12: false, })
+    .replace(',', ' -')
 
 export {
     toBN,

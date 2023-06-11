@@ -10,9 +10,7 @@ function ModalImg({ show, onHide, imgSrc, name, onOpenNewTab }) {
             size="lg"
             aria-labelledby="contained-modal-title-vcenter"
             centered
-            style={{
-                backdropFilter: "brightness(80%)",
-            }}
+            style={{ backdropFilter: "brightness(80%)" }}
         >
             <Modal.Header className='pt-1 pb-0 ps-3 pe-1 fs-5'>
                 <Modal.Title id="contained-modal-title-vcenter">
@@ -37,8 +35,10 @@ function ModalImg({ show, onHide, imgSrc, name, onOpenNewTab }) {
                 <img
                     src={imgSrc}
                     alt={name}
-                    className="h-100 w-100"
+                    className="w-100"
                     style={{
+                        maxHeight: '80vh',
+                        objectFit: 'cover',
                         borderRadius: '0px 0px var(--bs-border-radius) var(--bs-border-radius)',
                     }}
                 />

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faUpRightFromSquare } from '@fortawesome/free-solid-svg-icons'
+import { faCopy } from '@fortawesome/free-regular-svg-icons'
 
 function TooltipCopy({
     children,
@@ -38,27 +38,30 @@ function TooltipCopy({
 
     return (
         <span className={'text-third ' + className}>
-            {contentLink && (
+            {contentCopy && (
                 <span
-                    aria-label={contentLinkTooltip || 'View in explorer'}
-                    className="cooltipz--bottom-left cooltipz-bg-color-light"
+                    className="cooltipz--bottom-left"
+                    aria-label={tooltipContentCopy}
+                    onMouseEnter={showTooltipCopy}
+                    onMouseLeave={hideTooltipCopy}
                 >
                     <FontAwesomeIcon
-                        icon={faUpRightFromSquare}
-                        onClick={openNewTab}
+                        icon={faCopy}
+                        onClick={copyToClipboard}
                         className='text-secondary'
                     /> { }
                 </span>
             )}
-            <span
-                aria-label={tooltipContentCopy}
-                className="cooltipz--bottom"
-                onClick={copyToClipboard}
-                onMouseEnter={showTooltipCopy}
-                onMouseLeave={hideTooltipCopy}
-            >
-                {children}
-            </span>
+            {contentLink
+                ? (<span
+                    className="cooltipz--bottom"
+                    aria-label={contentLinkTooltip || 'View in explorer'}
+                    onClick={openNewTab}
+                >
+                    {children}
+                </span>)
+                : children
+            }
         </span>
     )
 }

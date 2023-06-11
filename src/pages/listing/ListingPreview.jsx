@@ -79,17 +79,6 @@ const ListingPreview = ({ listingForm, item }) => {
             </div>
 
             <div className="card-body p-2">
-                <ButtonImg
-                    imgUrl={toImgUrl(item.owner.thumbnail)}
-                    title={<>
-                        {item.owner.name} {(item.owner.status === ACCOUNT_STATE.VERIFIED) && <FontAwesomeIcon
-                            icon={faCircleCheck}
-                            className='text-primary ps-1 pt-1'
-                        />}
-                    </>}
-                    className='text-secondary'
-                />
-
                 <p className="card-text fs-6 pt-2">
                     <span className='text-secondary'>
                         {(listingForm.method === 'fixed')
