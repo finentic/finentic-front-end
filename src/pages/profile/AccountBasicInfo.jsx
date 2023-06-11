@@ -35,14 +35,14 @@ function AccountBasicInfo({ account, isOwner }) {
         <div
             style={{
                 backgroundImage: `url("${avatar || toImgUrl(account.thumbnail)}")`,
-                backgroundRepeat: 'no-repeat',
-                backgroundSize: 'cover',
+                // backgroundRepeat: 'no-repeat',
+                backgroundSize: '10px auto',
                 height: 200,
             }}
         >
             <div className='' style={{
                 backgroundColor: 'rgb(255 255 255 / 0.8)',
-                backdropFilter: "blur(8px)",
+                backdropFilter: "blur(4px)",
                 height: 205,
             }}>
                 <div className='container py-4'>

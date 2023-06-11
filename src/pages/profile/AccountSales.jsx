@@ -41,10 +41,15 @@ function AccountSales({ accountDetail }) {
 
   return (
     <div className=''>
-      <div className='p-3' style={{
-        background: '#fff',
-        backgroundImage: 'linear-gradient(180deg, #fff, #f8f9fa)',
-      }}>
+      <div
+        style={{
+          background: '#fff',
+          backgroundImage: 'linear-gradient(180deg, #fff, #f8f9fa)',
+          overflowX: 'auto',
+          whiteSpace: 'nowrap',
+        }}
+        className='scrollbar-hidden p-3'
+      >
         <div
           className={`btn btn-secondary me-2 rounded-pill ${(filter === SALES_KEY.All) && 'disabled'}`}
           onClick={() => handleFilter(SALES_KEY.All)}

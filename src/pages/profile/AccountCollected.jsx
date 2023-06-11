@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import {
   getAllCollectionOfAccount,
   getAllItemsAuctionListingOfAccount,
+  getAllItemsCreatedOfAccount,
   getAllItemsFixedPriceListingOfAccount,
   getAllItemsOfAccount,
 } from '../../api'
@@ -10,6 +11,7 @@ import { CollectionCard } from '../../components/collection-card'
 
 const COLLECTED_KEY = {
   NFTs: 'NFTs',
+  Created: 'Created',
   Collections: 'Collections',
   FixedPrice: 'FixedPrice',
   Auction: 'Auction',
@@ -29,6 +31,7 @@ function AccountCollected({ accountDetail }) {
       try {
         let items, collections
         if (filter === COLLECTED_KEY.NFTs) items = await getAllItemsOfAccount(accountDetail._id)
+        if (filter === COLLECTED_KEY.Created) items = await getAllItemsCreatedOfAccount(accountDetail._id)
         if (filter === COLLECTED_KEY.Collections) collections = await getAllCollectionOfAccount(accountDetail._id)
         if (filter === COLLECTED_KEY.FixedPrice) items = await getAllItemsFixedPriceListingOfAccount(accountDetail._id)
         if (filter === COLLECTED_KEY.Auction) items = await getAllItemsAuctionListingOfAccount(accountDetail._id)
@@ -47,15 +50,26 @@ function AccountCollected({ accountDetail }) {
 
   return (
     <div className=''>
-      <div className='p-3' style={{
+      <div
+      style={{
         background: '#fff',
         backgroundImage: 'linear-gradient(170deg, #fff, #f8f9fa)',
-      }}>
+        overflowX: 'auto',
+        whiteSpace: 'nowrap',
+      }}
+      className='scrollbar-hidden p-3'
+      >
         <div
           className={`btn btn-secondary me-2 rounded-pill ${(filter === COLLECTED_KEY.NFTs) && 'disabled'}`}
           onClick={() => handleFilter(COLLECTED_KEY.NFTs)}
         >
           NFTs
+        </div>
+        <div
+          className={`btn btn-secondary me-2 rounded-pill ${(filter === COLLECTED_KEY.Created) && 'disabled'}`}
+          onClick={() => handleFilter(COLLECTED_KEY.Created)}
+        >
+          Created
         </div>
         <div
           className={`btn btn-secondary me-2 rounded-pill ${(filter === COLLECTED_KEY.Collections) && 'disabled'}`}
@@ -76,7 +90,7 @@ function AccountCollected({ accountDetail }) {
           Auction listing
         </div>
       </div>
-      {collectionList.map(collection =>console.log(collection))}
+
       <div className='py-3 row'>
         {(filter !== COLLECTED_KEY.Collections)
           ? itemList.map(item => <ItemCard item={item} key={item._id} />)

@@ -5,7 +5,6 @@ import { Tab, Tabs } from 'react-bootstrap'
 import { useParams } from 'react-router-dom'
 import { getAccount } from '../../api'
 import { useEth } from '../../contexts'
-import { AccountCreated } from './AccountCreated'
 import { AccountCollected } from './AccountCollected'
 import { AccountSales } from './AccountSales'
 import { AccountPurchase } from './AccountPurchase'
@@ -59,9 +58,6 @@ function ProfileBody({ accountDetail }) {
           >
             <Tab eventKey="collected" title="Collected">
               <AccountCollected accountDetail={accountDetail} />
-            </Tab>
-            <Tab eventKey="created" title="Created">
-              <AccountCreated accountDetail={accountDetail} />
             </Tab>
             <Tab eventKey="sales" title="Sales orders">
               <AccountSales accountDetail={accountDetail} />
