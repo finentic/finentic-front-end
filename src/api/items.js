@@ -13,6 +13,18 @@ function searchItem(keywords) {
   return axiosInstance.get('/items/search', { params: { keywords } })
 }
 
+function searchItemAuction(keywords) {
+  return axiosInstance.get('/items/search/auction', { params: { keywords } })
+}
+
+function searchItemFixedPrice(keywords) {
+  return axiosInstance.get('/items/search/fixed-price', { params: { keywords } })
+}
+
+function searchItemAddress(keywords) {
+  return axiosInstance.get('/items/search/address', { params: { keywords } })
+}
+
 function exploreItems() {
   return axiosInstance.get('/items/explore')
 }
@@ -107,11 +119,15 @@ function getAllItemOfCollection(collection_address) {
 
 
 export {
+  searchItem,
+  searchItemAuction,
+  searchItemFixedPrice,
+  searchItemAddress,
+
   exploreItems,
   getItemById,
   exploreItemsFixedPrice,
   exploreItemsAuction,
-  searchItem,
   getItemsSuggested,
   updateItem,
   createItem,
