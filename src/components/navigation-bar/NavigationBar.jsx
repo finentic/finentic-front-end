@@ -11,18 +11,30 @@ import {
     faFolderPlus,
     faFilePen
 } from '@fortawesome/free-solid-svg-icons'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useEth } from '../../contexts'
 import { ROUTERS_PATH } from '../../routers/MainRoutes'
 import { constants } from 'ethers'
 
-function NavigationBar(props) {
+function NavigationBar({ keyword, setKeyword }) {
     const eth = useEth()
     const navigate = useNavigate()
-    const [expanded, setExpanded] = useState(false);
+    const location = useLocation()
+    const [expanded, setExpanded] = useState(false)
+
+    const handleOnSearch = event => {
+        event.preventDefault()
+        setExpanded(true)
+        const value = document.getElementById('search').value.trim()
+        if (value) {
+            setKeyword(value)
+            if (ROUTERS_PATH.search !== location.pathname.substring(1)) navigate(ROUTERS_PATH.search)
+        }
+    }
+
     return (
         <Navbar expand="lg" bg="white" fixed="top" className='shadow-sm' expanded={expanded} style={{ height: 50 }}>
-            <Container>
+            <Container className='bg-white'>
                 <Navbar.Brand onClick={() => navigate('/')} className='cursor-pointer'>
                     <img
                         src="/logo/brand_V.png"
@@ -38,26 +50,22 @@ function NavigationBar(props) {
                 <Navbar.Toggle aria-controls="responsive-navbar-nav" onClick={() => setExpanded(!expanded)} />
                 <Navbar.Collapse id="responsive-navbar-nav">
                     <Nav className="col"></Nav>
-                    <Nav className="col-12 col-lg-6 me-4">
-                        <form
-                            className="input-group"
-                            onSubmit={e => {
-                                setExpanded(true)
-                                e.preventDefault()
-                                const value = document.getElementById('search').value
-                                if (value) {
-                                    props.handleKeywordsChange(value)
-                                    navigate('/search')
-                                }
-                            }}
-                        >
+                    <Nav className="col-12 col-lg-6 me-4 my-3 my-lg-0">
+                        <form className="input-group" onSubmit={handleOnSearch}>
                             <label className="input-group-text bg-white" htmlFor='search'><FontAwesomeIcon icon={faSearch} /></label>
-                            <input type="search" className="form-control form-control-sm" name='search' id='search' placeholder="Find index, item name, and address" />
+                            <input
+                                type="search"
+                                className="form-control form-control-sm"
+                                name='search'
+                                id='search'
+                                placeholder="Find name, collection, or creator"
+                                defaultValue={keyword}
+                            />
                         </form>
                     </Nav>
                     <Nav className="col"></Nav>
 
-                    <Nav>
+                    <Nav className='mb-3 mb-lg-0'>
                         {(eth.account && eth.account._id !== constants.AddressZero)
                             ? <NavDropdown
                                 className='rounded-2 fw-bold'
@@ -85,6 +93,8 @@ function NavigationBar(props) {
                                         style={{ width: 20 }}
                                     /> Create Collection
                                 </NavDropdown.Item>
+
+                                <NavDropdown.Divider />
 
                                 <NavDropdown.Item onClick={() => {
                                     setExpanded(false)
@@ -122,13 +132,12 @@ function NavigationBar(props) {
                             </NavDropdown>
                             : <Nav.Link className='fw-bold' onClick={() => {
                                 setExpanded(false)
-                                navigate('/account/' + eth.account._id)
                             }}>
                                 <FontAwesomeIcon
                                     icon={faPlug}
                                     className='text-third pe-2'
                                     style={{ width: 20 }}
-                                /> Connect
+                                /> Disconnected
                             </Nav.Link>
                         }
                     </Nav>

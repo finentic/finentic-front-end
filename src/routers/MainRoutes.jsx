@@ -14,10 +14,14 @@ import {
   Collection,
 } from "../pages"
 import { NavigationBar } from "../components"
+import { Search } from "../pages/search"
+import { useState } from "react"
 
 const ROUTERS_PATH = {
   account: 'account/',
   create: 'create/',
+  explore: 'explore/',
+  search: 'search/',
   createCollection: 'create/collection/',
   collection: 'collection/',
   error500: 'error-500/',
@@ -28,17 +32,20 @@ const ROUTERS_PATH = {
 }
 
 const MainRoutes = () => {
+  const [keyword, setKeyword] = useState('')
+
   return (
     <>
-      <NavigationBar />
-      <div style={{ paddingTop: "50px" , minHeight: '100vh'}} className="bg-light">
+      <NavigationBar keyword={keyword} setKeyword={setKeyword} />
+      <div style={{ paddingTop: "50px", minHeight: '100vh' }} className="bg-light">
         <Routes >
           <Route path="/">
             <Route index element={<Home pageTitle="Home" />} />
             <Route path={ROUTERS_PATH.home} element={<Navigate to="/" replace />} />
+            <Route path={ROUTERS_PATH.search} element={<Search pageTitle="Search" keyword={keyword} setKeyword={setKeyword} />} />
 
             {/* Account */}
-            <Route path={`${ROUTERS_PATH.account}:accountId`} element={<Profile pageTitle="Account profile" />} />
+            < Route path={`${ROUTERS_PATH.account}:accountId`} element={<Profile pageTitle="Account profile" />} />
 
             {/* Create */}
             <Route path={ROUTERS_PATH.create} element={<Create pageTitle="Create NFT" />} />
