@@ -1,5 +1,10 @@
 import { axiosInstance, axiosUploadFileInstance } from "./axiosInstance";
 
+
+function searchCollection(keywords) {
+  return axiosInstance.get('/collections/search', { params: { keywords } })
+}
+
 function createCollection(formData) {
   return axiosUploadFileInstance.post('/collections/create', formData)
 }
@@ -27,6 +32,7 @@ function updateCollectionPicture(formData) {
 
 export {
   createCollection,
+  searchCollection,
   getCollection,
   getAllCollections,
   getAllCollectionOfAccount,
